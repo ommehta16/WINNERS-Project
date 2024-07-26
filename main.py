@@ -2,15 +2,16 @@ import pygame
 from PIL import Image
 import numpy as np
 import sys
+import math
+import ui_elements
 
 
-def dist_squared(a, b):
-    return (a[0]-b[0])**2 + (a[1]-b[1])**2
+def dist(a, b):
+    return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
 
 def main():
     pygame.init()
-
-
+    clock = pygame.time.Clock()
     # Set up display
     screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption('the thing')
@@ -18,8 +19,8 @@ def main():
     # Main loop
     running = True
     frame = 0
+    button = ui_elements.Button([0,0],[10,10])
     while running:
-        prev_time = pygame.time.get_ticks()
         
         prev_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -31,8 +32,12 @@ def main():
         
         # Fill the screen with a color
         screen.fill(color)
-        pygame.draw.circle(screen,"red",pygame.mouse.get_pos(),dist_squared(pygame.mouse.get_pos(),prev_pos)/100+10)
-        pygame.time.delay(max(0,pygame.time.get_ticks() + 16 - prev_time))
+        
+        pygame.draw.circle(screen,"red",pygame.mouse.get_pos(),
+                           dist(pygame.mouse.get_pos(),prev_pos)+2)
+        # DELETE THIS ^^^
+        button.draw(screen)
+        clock.tick(60)
         pygame.display.flip()
         frame+=1
         
