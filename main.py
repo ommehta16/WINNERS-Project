@@ -10,39 +10,41 @@ def dist(a, b):
     return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
 
 def main():
+    # Set up pygame
     pygame.init()
     clock = pygame.time.Clock()
-    # Set up display
     screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption('the thing')
-    color = (0, 128, 255)
-    # Main loop
+    background_color = (120, 120, 120)
+
     running = True
     frame = 0
-    button = ui_elements.Button([0,0],[10,10])
+    button = ui_elements.Button([10,10],[25,25],lambda:0,_text="a")
+    another_button = ui_elements.Button([100,100],[200,50],lambda:0,_text="broo")
+    
+    # Main loop
     while running:
-        
+        frame+=1
         prev_pos = pygame.mouse.get_pos()
+        
+        # Check on events
+        clicked: bool = False 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                color = "red"
+            if event.type == pygame.QUIT:            running = False
+            if event.type == pygame.MOUSEBUTTONDOWN: clicked = True
         
+        # UPDATE EVERYTHING
+        button.update(clicked)
+        another_button.update(clicked)
         
-        # Fill the screen with a color
-        screen.fill(color)
-        
-        pygame.draw.circle(screen,"red",pygame.mouse.get_pos(),
-                           dist(pygame.mouse.get_pos(),prev_pos)+2)
-        # DELETE THIS ^^^
+        # DRAW EVERYTHING
+        screen.fill(background_color)
         button.draw(screen)
+        another_button.draw(screen)
+        
         clock.tick(60)
         pygame.display.flip()
-        frame+=1
-        
-        
-        
+    
     pygame.quit()
 
 if (__name__ == "__main__"):
