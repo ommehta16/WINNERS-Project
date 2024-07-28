@@ -35,11 +35,3 @@ def sharpen(img:str, intensity:float):
     out = (out - min_value) / (max_value - min_value)
     return out
 
-i = sharpen('color.png', 8)
-
-Image.fromarray(i.astype(np.uint8)).save("sharpened3.png")
-            
-i = sharpen('downloads/blur.png', 4.0)
-Image.fromarray(i.astype(np.uint8)).save("dithered_ex_img.jpg")
-
-
