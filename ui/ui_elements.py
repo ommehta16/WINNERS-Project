@@ -16,14 +16,20 @@ class Button:
         self.text=_text
         self.font = pygame.font.SysFont(_font,_fontsize)
         self.outline_width = outline_width
+        self.image:pygame.Surface = None
         
     def draw(self):
         screen = pygame.display.get_surface()
         if self.is_hovered: pygame.draw.rect(screen,self.hover_color,self.rect)
         else: pygame.draw.rect(screen,self.color,self.rect)
         pygame.draw.rect(screen,self.outline_color,self.rect,self.outline_width)
-        text = self.font.render(self.text,True,self.outline_color)
-        screen.blit(text,(self.rect.centerx-text.get_size()[0]/2,self.rect.centery-text.get_size()[1]/2))
+        
+        if len(self.text):
+            text = self.font.render(self.text,True,self.outline_color)
+            screen.blit(text,(self.rect.centerx-text.get_size()[0]/2,self.rect.centery-text.get_size()[1]/2))
+        
+        if self.image != None:
+            screen.blit(self.image,(self.rect.centerx-self.image.get_size()[0]/2,self.rect.centery-self.image.get_size()[1]/2))
         
     def update(self, click:bool):
         mouse_pos = pygame.mouse.get_pos()
@@ -37,6 +43,12 @@ class Button:
         
         # TODO: DO THIS!!!
         pass
+    
+    def set_image(self, image_path:str):
+        self.text = ""
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image,(min(self.size[0],self.image.get_size()[0]),min(self.size[1],self.image.get_size()[1])))
+        
     
     
 class ButtonGrid:
@@ -69,7 +81,7 @@ class ButtonGrid:
         elif self.grid_size[1] == 0:
             size = (self.size[0]/self.grid_size[0],_minor_axis_size_spec)
             if len(self.buttons) and len(self.buttons) % self.grid_size[0] == 0:
-                pos=(self.location[0],self.buttons[-1].rect.top+size[1])
+                pos=(self.location[0],self.buttons[-1].rect.top+self.buttons[-1].size[1])
             elif len(self.buttons):
                 pos=(self.buttons[-1].rect.right,self.buttons[-1].rect.top)
             # You get a SQUARE button if you don't specify the y-grid size
@@ -96,12 +108,6 @@ class ButtonGrid:
             self.rect = pygame.rect.Rect(self.location[0],self.location[1],self.size[0],self.size[1])
         for button in self.buttons:
             button.update(click)
-        
-        if len(self.buttons):
-            self.size[1] = (self.size[1] * 4 + (self.buttons[-1].rect.bottom - self.location[1]) * 1)/5
-            
-            if abs(self.size[1] - self.buttons[-1].rect.bottom - self.location[1]) <= epsilon:
-                self.size[1] = self.buttons[-1].rect.bottom - self.location[1]
                 
                 
 class Prompt:
