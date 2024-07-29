@@ -62,6 +62,13 @@ class Blur:
     
 class EdgeDetect:
     def dog(img:Image,r1:float,r2:float) -> Image:
+        def grayscale(image:np.array) -> np.array:
+            img = 0.3 * image[:,:,0] + 0.59*image[:,:,1] + 0.11*image[:,:,2]
+            return img
+        img1 = np.array(Blur.gaussian(img,16,r1)).astype(int)
+        img2 = np.array(Blur.gaussian(img,16,r2)).astype(int)
+        img = Image.fromarray(grayscale(img1-img2).astype(np.uint8))
+        
         # Applies 2 gaussian blurs --> takes the difference (gaussian(img,r1)-gaussian(img,r2))
         
         return img
@@ -74,7 +81,7 @@ class EdgeDetect:
     
 if __name__ == "__main__":
     rn = time.time()
-    img = Image.open("time-transfixed.jpg")
+    img = Image.open("chicken.webp")
 
-    Blur.gaussian(img,32,20).save("joe.png")
+    EdgeDetect.dog(img,2,1.5).save("joe.png")
     print(time.time()-rn)
