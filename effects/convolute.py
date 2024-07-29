@@ -34,18 +34,19 @@ def convolute(img,conv:np.array) -> Image:
 
 class Blur:
     
+    def generate_gauss_kernel(rad,sigma) -> np.array:
+        arr = np.zeros((2*rad+1,2*rad+1))
+        inv_sigma = 1/sigma
+        d_squared = lambda x,y: x**2 + y**2
+        G = lambda x,y: 0.159154943 * inv_sigma * math.exp(-0.5 * inv_sigma * d_squared(x-rad,y-rad))
+        for y in range(2*rad+1):
+            for x in range(2*rad+1):
+                arr[x,y] = G(x,y)
+                
+        return arr/arr.sum()
+
     def gaussian(img:Image,radius:float,sigma:float) -> Image:
-        def generate_kernel(rad,sigma) -> np.array:
-            arr = np.zeros((2*rad+1,2*rad+1))
-            inv_sigma = 1/sigma
-            d_squared = lambda x,y: x**2 + y**2
-            G = lambda x,y: 0.159154943 * inv_sigma * math.exp(-0.5 * inv_sigma * d_squared(x-rad,y-rad))
-            for y in range(2*rad+1):
-                for x in range(2*rad+1):
-                    arr[x,y] = G(x,y)
-                    
-            return arr/arr.sum()
-        img = convolute(img,generate_kernel(radius,sigma))
+        img = convolute(img,Blur.generate_gauss_kernel(radius,sigma))
         
         return img
     
@@ -61,16 +62,15 @@ class Blur:
     
     
 class EdgeDetect:
-    def dog(img:Image,r1:float,r2:float) -> Image:
+    def dog(img:Image,r1:float,r2:float,prominence:float) -> Image:
         def grayscale(image:np.array) -> np.array:
             img = 0.3 * image[:,:,0] + 0.59*image[:,:,1] + 0.11*image[:,:,2]
             return img
-        img1 = np.array(Blur.gaussian(img,16,r1)).astype(int)
-        img2 = np.array(Blur.gaussian(img,16,r2)).astype(int)
-        img = Image.fromarray(grayscale(img1-img2).astype(np.uint8))
         
-        # Applies 2 gaussian blurs --> takes the difference (gaussian(img,r1)-gaussian(img,r2))
+        flt = prominence*20*(Blur.generate_gauss_kernel(16,r1)-Blur.generate_gauss_kernel(16,r2))
         
+        img = convolute(img,flt)
+        img = Image.fromarray(np.clip(grayscale(np.array(img).astype(int)),0,255).astype(np.uint8))
         return img
     
     def lapofgaussian(img:Image) -> Image:
@@ -81,7 +81,7 @@ class EdgeDetect:
     
 if __name__ == "__main__":
     rn = time.time()
-    img = Image.open("chicken.webp")
+    img = Image.open("test/chicken.webp")
 
-    EdgeDetect.dog(img,2,1.5).save("joe.png")
+    EdgeDetect.dog(img,2,1.5,2.5).save("test/dogged.png")
     print(time.time()-rn)
