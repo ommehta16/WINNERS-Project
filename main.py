@@ -31,6 +31,7 @@ def main():
     side_bar.buttons[0].set_image("images/ex.png")
     
     # <-- TEMP
+    slider = ui_elements.Slider((400, 500), (200, 20), 0.5, 0, 100)
     
     # Main loop
     while running:
@@ -42,7 +43,10 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:            running = False
             if event.type == pygame.MOUSEBUTTONDOWN: clicked = True
-        
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                clicked = True
+            slider.handle_event(event)
+            
         # UPDATE EVERYTHING
         button.update(clicked)
         another_button.update(clicked)
@@ -56,7 +60,7 @@ def main():
         button.draw()
         another_button.draw()
         side_bar.draw()
-        
+        slider.draw(screen)
         clock.tick(60)
         pygame.display.flip()
     
