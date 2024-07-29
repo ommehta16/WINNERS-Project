@@ -1,18 +1,24 @@
 from PIL import Image
 import numpy as np
+import time
 
 
-def brightness(img:str, change:float):
-    image = Image.open(img)
-    image = np.array(image).astype(int)
-    new_image = np.array(image)
+def brightness(image:Image, change:float) -> Image:
+    img = np.array(image).astype(int)
 
-    for y in range(new_image.shape[0]):
-        for x in range(new_image.shape[1]):
-            new_image[y,x] += change
+    img+=change
+    
+    img = np.clip(img,0,255)
+    return Image.fromarray(img.astype(np.uint8))
 
-    return new_image
+if __name__ == "__main__": # Time test code
+    rn = time.time()
+    img = Image.open("time-transfixed.jpg")
 
+    brightness(img,200).save("joe.png")
+    print(time.time()-rn)
+    
+    # on Om's computer, brightness takes 0.19944024085998535 seconds (That's FAST!)
 
 
 

@@ -2,15 +2,13 @@ from PIL import Image
 import numpy as np
 import math
 import sys
+import time
 
-def sepia(img: str, intensity: float):
-    if intensity < 0:
-        intensity = 0
-    elif intensity > 1:
-        intensity = 1
+def sepia(img: Image, intensity: float) -> Image:
+    
+    intensity = min(1,max(0,intensity))
 
-    image = Image.open(img)
-    image = np.array(image).astype(int)
+    image = np.array(img).astype(int)
 
     # values taken from https://yabirgb.com/sepia_filter/
 
@@ -23,4 +21,13 @@ def sepia(img: str, intensity: float):
 
     new_image = (image * (1 - intensity) + new_image * intensity).astype(np.uint8)
 
-    return new_image
+    return Image.fromarray(new_image)
+
+if __name__ == "__main__": # Time test code
+    rn = time.time()
+    img = Image.open("time-transfixed.jpg")
+
+    sepia(img,1.6).save("joe.png")
+    print(time.time()-rn)
+    
+    # on Om's computer, saturation takes 0.7326478958129883 seconds (That's fairly FAST)
