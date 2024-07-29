@@ -22,7 +22,6 @@ def convolute(img,conv:np.array) -> Image:
     img_arr = np.array(img).astype(int)
     
     new_img = np.zeros(img_arr.shape).astype(int)
-    
     # mp = ~33% speed improvement on convolution
     with Pool() as pool:
         chnl_list = pool.starmap(conv_1_chnl,[(img_arr[:,:,i],conv) for i in range(3)])
@@ -72,16 +71,32 @@ class EdgeDetect:
         img = convolute(img,flt)
         img = Image.fromarray(np.clip(grayscale(np.array(img).astype(int)),0,255).astype(np.uint8))
         return img
-    
-    def lapofgaussian(img:Image) -> Image:
-        # Apply laplacian of gaussain (mexican hat :) )
+    def mono_dog(img:Image,r1:float,r2:float,prominence:float) -> Image:
+        flt = prominence*20*(Blur.generate_gauss_kernel(16,r1)-Blur.generate_gauss_kernel(16,r2))
         
+        img_arr = conv_1_chnl(np.array(img).astype(int),flt)
+        img = Image.fromarray(np.clip(img_arr,0,255).astype(np.uint8))
         return img
     
     
 if __name__ == "__main__":
     rn = time.time()
-    img = Image.open("test/chicken.webp")
+    img = Image.open("test/time-transfixed.jpg")
 
-    EdgeDetect.dog(img,2,1.5,2.5).save("test/dogged.png")
+    dogged = EdgeDetect.dog(img,2,1.5,2.5)
+    dogged.save("test/dogged.png")
+
+    #dogged = Image.open("test/dogged.png")
+    
+    original_arr = np.array(img).astype(int)
+    dogged_arr = np.zeros(original_arr.shape)
+    for i in range(3):
+        dogged_arr[:,:,i] = np.array(dogged).astype(int)
+    
+    dogged_arr = dogged_arr * 1/255
+    original_arr = original_arr*dogged_arr
+
+    img = Image.fromarray(np.clip(original_arr,0,255).astype(np.uint8))
+    img.save("test/goofed.png")
+
     print(time.time()-rn)
