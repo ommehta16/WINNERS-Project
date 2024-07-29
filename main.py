@@ -13,9 +13,10 @@ def main():
     # Set up pygame
     pygame.init()
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode((800, 600))
+    screen = pygame.display.set_mode((1920, 1080))
+    screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
     pygame.display.set_caption('the thing')
-    background_color = (120, 120, 120)
+    background_color = ('#F5FFFA')
 
     running = True
     frame = 0
