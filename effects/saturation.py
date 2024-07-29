@@ -2,13 +2,27 @@ from PIL import Image
 import numpy as np
 import math
 import sys
+import time
 
-def saturation(img:Image, value:int) -> Image:
-    img = np.array(img).astype(int)
-    for y in range(img.shape[0]):
-        for x in range(img.shape[1]):
-            L = 0.3 * img[y,x][0] + 0.59*img[y,x][1] + 0.11*img[y,x][2]
-            img[y, x] = (value*img[y, x]) + (1-value)*L
-    img = np.clip(img, 0, 255)
-    Image.fromarray(img.astype(np.uint8)).save('output.png')
-    return img
+def saturation(img:Image, value:float) -> Image:
+    value = float(value)
+        
+    img_arr = np.array(img)
+    lum_arr = np.zeros(img_arr.shape)
+    
+    l_1_c = 0.3 * img_arr[:,:,0] + 0.59*img_arr[:,:,1] + 0.11*img_arr[:,:,2]
+    
+    for i in range(3): lum_arr[:,:,i] = l_1_c
+    img_arr = value * img_arr + (1-value) * lum_arr
+    
+    img_arr = np.clip(img_arr, 0, 255)
+    return Image.fromarray(img_arr.astype(np.uint8))
+
+if __name__ == "__main__": # Time test code
+    rn = time.time()
+    img = Image.open("time-transfixed.jpg")
+
+    saturation(img,1).save("joe.png")
+    print(time.time()-rn)
+    
+    # on Om's computer, saturation takes 0.594005823135376 seconds (That's pretty FAST)

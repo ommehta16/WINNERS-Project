@@ -1,3 +1,8 @@
+from PIL import Image
+import numpy as np
+import math
+import sys
+
 def soften(img: Image, value:int):
     img = np.array(img).astype(int)
     for y in range(img.shape[0]):
