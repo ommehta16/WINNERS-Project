@@ -20,9 +20,9 @@ def saturation(img:Image, value:float) -> Image:
 
 if __name__ == "__main__": # Time test code
     rn = time.time()
-    img = Image.open("time-transfixed.jpg")
+    img = Image.open("test/time-transfixed.jpg")
 
-    saturation(img,1).save("joe.png")
+    saturation(img,1).save("test/joe.png")
     print(time.time()-rn)
     
     # on Om's computer, saturation takes 0.594005823135376 seconds (That's pretty FAST)

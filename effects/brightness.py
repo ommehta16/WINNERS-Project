@@ -13,9 +13,9 @@ def brightness(image:Image, change:float) -> Image:
 
 if __name__ == "__main__": # Time test code
     rn = time.time()
-    img = Image.open("time-transfixed.jpg")
+    img = Image.open("test/time-transfixed.jpg")
 
-    brightness(img,200).save("joe.png")
+    brightness(img,200).save("test/joe.png")
     print(time.time()-rn)
     
     # on Om's computer, brightness takes 0.19944024085998535 seconds (That's FAST!)

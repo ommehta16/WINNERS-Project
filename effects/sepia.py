@@ -25,9 +25,9 @@ def sepia(img: Image, intensity: float) -> Image:
 
 if __name__ == "__main__": # Time test code
     rn = time.time()
-    img = Image.open("time-transfixed.jpg")
+    img = Image.open("test/time-transfixed.jpg")
 
-    sepia(img,1.6).save("joe.png")
+    sepia(img,1.6).save("test/joe.png")
     print(time.time()-rn)
     
     # on Om's computer, saturation takes 0.7326478958129883 seconds (That's fairly FAST)

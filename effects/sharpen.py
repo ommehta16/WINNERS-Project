@@ -42,9 +42,9 @@ def sharpen(img:Image, intensity:float, power:float) -> Image:
 
 if __name__ == "__main__": # Time test code
     rn = time.time()
-    img = Image.open("time-transfixed.jpg")
+    img = Image.open("test/time-transfixed.jpg")
 
-    sharpen(img,1,1).save("joe.png")
+    sharpen(img,1,1).save("test/joe.png")
     print(time.time()-rn)
     
     # on Om's computer, sharpening takes 8.622666835784912 seconds (That's pretty meh)
