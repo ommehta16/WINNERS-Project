@@ -20,6 +20,7 @@ class Button:
         self.font = pygame.font.SysFont(_font, _fontsize)
         self.out_size = outline_width
         self.image: pygame.Surface = None
+        self.rendered_text = None
         
     def draw(self):
         screen = pygame.display.get_surface()
@@ -28,7 +29,7 @@ class Button:
         pygame.draw.rect(screen,self.colors["outline"],self.rect,self.out_size)
         
         if self.image != None:
-            screen.blit(self.image,(self.rect.centerx-self.image.get_size()[0]/2,self.rect.top))
+            if self.image.get_size()[0] > 20 and self.image.get_size()[1] > 20: screen.blit(self.image,(self.rect.centerx-self.image.get_size()[0]/2,self.rect.top))
             if self.rendered_text != None: screen.blit(self.rendered_text,(self.rect.centerx-self.rendered_text.get_size()[0]/2,self.rect.top+self.image.get_size()[1]))
         elif self.rendered_text != None: screen.blit(self.rendered_text,(self.rect.centerx-self.rendered_text.get_size()[0]/2,self.rect.top))
         
@@ -40,7 +41,13 @@ class Button:
             if click:
                 self.on_click()
         
-        if self.text: self.rendered_text = self.font.render(self.text,True,"black")
+        if self.text:
+            self.rendered_text = self.font.render(self.text,True,"black")
+            if self.rendered_text.get_size()[0] > self.rect.size[0] or self.rendered_text.get_size()[1] > self.rect.size[1]:
+                txt_ratio = self.rendered_text.get_size()[1]/self.rendered_text.get_size()[0]
+                curr_size = self.rendered_text.get_size()
+                target_size = (min(curr_size[0],self.rect.size[0]-10),int(min(curr_size[1],(self.rect.size[0]-10)*txt_ratio)))
+                self.rendered_text = pygame.transform.scale(self.rendered_text,target_size)
         else: self.rendered_text = None
 
         if self.image:
@@ -48,13 +55,16 @@ class Button:
             if self.text: text_height = self.rendered_text.get_size()[1]
             img_size = self.orig_image.get_size()
             ratio = img_size[0]/img_size[1]
-            max_h = self.rect.height-text_height
+            max_h = self.rect.height-text_height-10
             max_w = self.rect.width
 
             target_size = (min(max_w,max_h*ratio),min(max_h,max_w/ratio))
-            self.image = pygame.transform.scale(self.orig_image,target_size)
+            if target_size[0] < 0 or target_size[1] < 1: self.image = pygame.transform.scale(self.image,(0,0))
+            else: self.image = pygame.transform.scale(self.orig_image,target_size)
 
-    
+    def update_font(self,size:int,font_name:str):
+        self.font = pygame.font.SysFont(font_name,size)
+        self.rendered_text = self.font.render(self.text,True,self.colors["outline"])
     def set_image(self, image_path:str):
         self.orig_image = pygame.image.load(image_path)
         self.image = self.orig_image.copy()
@@ -77,7 +87,7 @@ class ButtonGrid:
     `loc` is the top-left, `grid_sz` controls the amount of grid spaces\n
     either `grid_sz[0]` or `grid_sz[1]` **must be > 0**
     '''
-    def __init__(self,loc:tuple[float],dims:tuple[float],grid_sz:tuple[int], bg_col="light gray",col="gray",hov_col="dark gray",outline_col="black",outline_width=1):
+    def __init__(self,loc:tuple[float],dims:tuple[float],grid_sz:tuple[int], bg_col="light gray",col="gray",hov_col="dark gray",outline_col="black",outline_width=1,font_size=12):
         if max(grid_sz) <= 0: raise ValueError
         self.rect = pygame.rect.Rect(loc[0],loc[1],dims[0],dims[1])
         self.colors = {
@@ -90,6 +100,7 @@ class ButtonGrid:
         self.outline_width = outline_width
         self.buttons:list[Button] = []
         self.grid_size:list[int] = [max(0,grid_sz[0]),max(0,grid_sz[1])]
+        self.font_size = font_size
     def add_button(self, _onclick=lambda: 0, _text: str = "", _font: str = "Calibri", _font_size: int = 12):
         pos = self.rect.topleft
         prev_rect = None
@@ -117,7 +128,7 @@ class ButtonGrid:
     def update(self,click:bool):
         for i in range(len(self.buttons)):
             self.buttons[i].update(click)
-            
+            self.buttons[i].update_font(self.font_size,"calibri")
             pos = self.rect.topleft
             
             prev_rect = None

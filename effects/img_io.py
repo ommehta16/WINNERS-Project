@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import pygame
 
 
 def img_to_arr(image:Image.Image) -> np.ndarray:
@@ -13,3 +14,6 @@ def open_img(file_name:str) -> Image.Image :
 
 def save_img(image:Image.Image, file_name:str) -> None:
     image.save(file_name)
+
+def pil_to_pyg(image:Image.Image) -> pygame.Surface:
+    return pygame.image.fromstring(image.tobytes(),image.size,image.mode).convert()
