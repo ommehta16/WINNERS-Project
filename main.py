@@ -21,8 +21,6 @@ def main():
     frame = 0
 
     # TEMP --> 
-    button = ui_elements.Button([300, 300], [25, 25], lambda: 0, _text="a")
-    another_button = ui_elements.Button([100, 100], [200, 50], lambda: 0, _text="broo")
     title_bar = ui_elements.ButtonGrid([0, 0], [screen.get_size()[0], 20], [0, 1])
     side_bar = ui_elements.ButtonGrid([0, 20], [screen.get_size()[0] / 6, screen.get_size()[1] - 20], [1, 9])  # Adjusted grid size for buttons
 
@@ -74,8 +72,6 @@ def main():
             slider.handle_event(event)
 
         # UPDATE EVERYTHING
-        button.update(clicked)
-        another_button.update(clicked)
         title_bar.update(clicked)
         side_bar.update(clicked)
 
@@ -83,10 +79,8 @@ def main():
         screen.fill(background_color)
         
         title_bar.draw()
-        button.draw()
-        another_button.draw()
         side_bar.draw()
-        slider.draw(screen)
+        
         
         # Draw the image preview
         screen.blit(preview_image, preview_rect.topleft)
