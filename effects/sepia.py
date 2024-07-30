@@ -22,7 +22,7 @@ def sepia(image: np.ndarray, intensity: float) -> np.ndarray:
     return new_image
 
 # Takes 0.411 seconds -- That's pretty FAST
-if __name__ == "__main__":
+'''if __name__ == "__main__":
     from img_io import *
     img_arr = img_to_arr(open_img("test/chicken.webp"))
     
@@ -31,4 +31,4 @@ if __name__ == "__main__":
     end = time.time()
     
     arr_to_img(new_img_arr).save("test/output.png")
-    print(str(end-start) + " seconds")
+    print(str(end-start) + " seconds")'''

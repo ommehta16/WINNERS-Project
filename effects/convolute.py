@@ -106,7 +106,7 @@ class EdgeDetect:
     img.save("test/goofed.png")
 
     print(time.time()-rn)'''
-
+'''
 # Takes 36.110 seconds -- That's SLOW
 if __name__ == "__main__":
     from img_io import *
@@ -117,4 +117,4 @@ if __name__ == "__main__":
     end = time.time()
     
     arr_to_img(new_img_arr).save("test/output.png")
-    print(str(end-start) + " seconds")
+    print(str(end-start) + " seconds")'''
