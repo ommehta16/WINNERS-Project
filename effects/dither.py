@@ -30,17 +30,7 @@ def dither_linear(img:np.ndarray,color:bool) -> np.ndarray:
         
     
     img = grayscale(img)
-    size = (img.shape[0],img.shape[1])
-    cutX = int(size[1]/8)*4
-    cutY = int(size[0]/8)*4
     
-    with Pool() as pool: sliced = pool.map(dither_piece,[img[:cutY,:cutX],img[:cutY,cutX:],img[cutY:,:cutX],img[cutY:,cutX:]])
-    img[:cutY,:cutX] = sliced[0]
-    img[:cutY,cutX:] = sliced[1]
-    img[cutY:,:cutX] = sliced[2]
-    img[cutY:,cutX:] = sliced[3]
-    img = chnl_1_to_3(img)
-
     filter = 255/16 * np.array([[15, 7,13, 5],
                                 [3 ,11, 1, 9],
                                 [12, 4,14, 6],
