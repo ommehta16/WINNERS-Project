@@ -4,7 +4,7 @@ import math
 import time
 import sys
 
-def dither(img:np.ndarray) -> np.ndarray:
+def dither(img:np.ndarray,color:bool) -> np.ndarray:
     
     # DITHER THE IMAGE
     
