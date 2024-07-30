@@ -160,47 +160,46 @@ class Prompt:
         return file_name
     
 class Slider:
-    def __init__(self,pos:tuple,size:tuple,initial_val:float,min:int,max:int) -> None:
+    def __init__(self, pos: tuple, size: tuple, initial_val: float, min_val: int, max_val: int) -> None:
         self.pos = pos
         self.size = size
 
-        self.slider_left_pos = self.pos[0] - (size[0]//2)
-        self.slider_right_pos = self.pos[0] + (size[0]//2)
-        self.slider_top_pos = self.pos[1] - (size[1]//2)
+        self.slider_left_pos = self.pos[0] - (size[0] // 2)
+        self.slider_right_pos = self.pos[0] + (size[0] // 2)
+        self.slider_top_pos = self.pos[1] - (size[1] // 2)
 
-        self.min = min
-        self.max = max
-        self.initial_val = (self.slider_right_pos - self.slider_left_pos)*initial_val #percentage
+        self.min = min_val
+        self.max = max_val
+        self.initial_val = (self.slider_right_pos - self.slider_left_pos) * initial_val  # percentage
 
         self.container_rect = pygame.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
-        self.button_rect = pygame.Rect(self.slider_left_pos + self.initial_val - 5, self.slider_top_pos,10,self.size[1])
+        self.button_rect = pygame.Rect(self.slider_left_pos + self.initial_val - 5, self.slider_top_pos, 10, self.size[1])
 
         self.dragging = False
 
     def move_slider(self, mouse_pos):
-        if self.dragging:
-            new_x = max(self.slider_left_pos, min(mouse_pos[0], self.slider_right_pos))
-            self.button_rect.centerx = new_x
+        new_x = max(self.slider_left_pos, min(mouse_pos[0], self.slider_right_pos))
+        self.button_rect.centerx = new_x
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.button_rect.collidepoint(event.pos):
+            if self.button_rect.collidepoint(event.pos) or self.container_rect.collidepoint(event.pos):
                 self.dragging = True
+                self.move_slider(event.pos)
         elif event.type == pygame.MOUSEBUTTONUP:
             self.dragging = False
-        elif event.type == pygame.MOUSEMOTION:
+        elif event.type == pygame.MOUSEMOTION and self.dragging:
             self.move_slider(event.pos)
-    
+
     def draw(self, screen):
-        
-        pygame.draw.rect(screen, (200, 200, 200), self.container_rect)  
+        pygame.draw.rect(screen, (200, 200, 200), self.container_rect)
         pygame.draw.rect(screen, (100, 100, 100), self.button_rect)
     
     def get_value(self):
         val_range = self.slider_right_pos - self.slider_left_pos
         button_val = self.button_rect.centerx - self.slider_left_pos
 
-        return(button_val/val_range)*(self.max-self.min)+self.min
+        return (button_val / val_range) * (self.max - self.min) + self.min
         
         
 
