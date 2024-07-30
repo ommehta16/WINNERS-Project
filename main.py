@@ -14,7 +14,6 @@ def main():
     pygame.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((1920, 1080))
-    screen = pygame.display.set_mode((0,0), pygame.RESIZABLE)
     pygame.display.set_caption('the thing')
     background_color = ('#F5FFFA')
 
@@ -35,20 +34,20 @@ def main():
     slider = ui_elements.Slider((400, 500), (200, 20), 0.5, 0, 100)
     
     side_bar_buttons = [
-        (lambda:print("blur time")      ,"images/icons/effects/blur.png"),
-        (lambda:print("contrast time")  ,"images/icons/effects/contrast.png"),
-        (lambda:print("dither time")    ,"images/icons/effects/dither.png"),
-        (lambda:print("sharpen time")   ,"images/icons/effects/sharpen.png"),
-        (lambda:print("sepia time")   ,"images/icons/effects/sepia.png"),
-        (lambda:print("soften time")   ,"images/icons/effects/soften.png"),
-        (lambda:print("brightness time")   ,"images/icons/effects/brightness.png"),
-        (lambda:print("dog time")   ,"images/icons/effects/dog.png"),
-        (lambda:print("hue time")   ,"images/icons/effects/hue.png")
+        (lambda: print("blur time"), "images/icons/effects/blur.png", "Blur"),
+        (lambda: print("contrast time"), "images/icons/effects/contrast.png", "Contrast"),
+        (lambda: print("dither time"), "images/icons/effects/dither.png", "Dither"),
+        (lambda: print("sharpen time"), "images/icons/effects/sharpen.png", "Sharpen"),
+        (lambda: print("sepia time"), "images/icons/effects/sepia.png", "Sepia"),
+        (lambda: print("soften time"), "images/icons/effects/soften.png", "Soften"),
+        (lambda: print("brightness time"), "images/icons/effects/brightness.png", "Brightness"),
+        (lambda: print("dog time"), "images/icons/effects/dog.png", "Dog"),
+        (lambda: print("hue time"), "images/icons/effects/hue.png", "Hue")
     ]
-    for i in range(len(side_bar_buttons)):
-        side_bar.add_button(_onclick=side_bar_buttons[i][0])
-        side_bar.buttons[i+1].set_image(side_bar_buttons[i][1])
-
+    
+    for action, image_path, text in side_bar_buttons:
+        side_bar.add_button(_onclick=action, _text=text, _color=(0, 174, 239))  # Use RGB tuple for color
+        side_bar.buttons[-1].set_image("images/Icons/Blur_Icon.png")  # Set the image for the button
 
     # Main loop
     while running:

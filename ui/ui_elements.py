@@ -71,30 +71,27 @@ class ButtonGrid:
         self.outline_width = outline_width
         self.buttons:list[Button] = []
         self.grid_size:list[int] = [max(0,grid_sz[0]),max(0,grid_sz[1])]
-    def add_button(self,_onclick=lambda:0,_text:str="",_font:str="Calibri",_font_size:int=12,_minor_axis_size_spec:float=25):
+    def add_button(self, _onclick=lambda: 0, _text: str = "", _font: str = "Calibri", _font_size: int = 12, _minor_axis_size_spec: float = 25, _color= "gray"):
         pos = self.location
         if self.grid_size[0] == 0:
-            tmp_txt:pygame.Surface=pygame.font.SysFont(_font,_font_size).render(_text,False,"black")
-            size = (max(tmp_txt.get_size()[0]+10,25),self.size[1])
-            if len(self.buttons): pos=(self.buttons[-1].rect.right,self.buttons[-1].rect.top)
-            # You get a TEXT-FITTED button if you don't specify the x-grid size
-        
+            tmp_txt: pygame.Surface = pygame.font.SysFont(_font, _font_size).render(_text, False, "black")
+            size = (max(tmp_txt.get_size()[0] + 10, 25), self.size[1])
+            if len(self.buttons):
+                pos = (self.buttons[-1].rect.right, self.buttons[-1].rect.top)
         elif self.grid_size[1] == 0:
-            size = (self.size[0]/self.grid_size[0],_minor_axis_size_spec)
+            size = (self.size[0] / self.grid_size[0], _minor_axis_size_spec)
             if len(self.buttons) and len(self.buttons) % self.grid_size[0] == 0:
-                pos=(self.location[0],self.buttons[-1].rect.top+self.buttons[-1].size[1])
+                pos = (self.location[0], self.buttons[-1].rect.top + self.buttons[-1].size[1])
             elif len(self.buttons):
-                pos=(self.buttons[-1].rect.right,self.buttons[-1].rect.top)
-            # You get a SQUARE button if you don't specify the y-grid size
+                pos = (self.buttons[-1].rect.right, self.buttons[-1].rect.top)
         else:
-            size = (self.size[0]/self.grid_size[0],self.size[1]/self.grid_size[1])
+            size = (self.size[0] / self.grid_size[0], self.size[1] / self.grid_size[1])
             if len(self.buttons) and len(self.buttons) % self.grid_size[0] == 0:
-                pos=(self.location[0],self.buttons[-1].rect.top+size[1])
+                pos = (self.location[0], self.buttons[-1].rect.top + size[1])
             elif len(self.buttons):
-                pos=(self.buttons[-1].rect.right,self.buttons[-1].rect.top)
-            # Otherwise, it fits itself to the shape
+                pos = (self.buttons[-1].rect.right, self.buttons[-1].rect.top)
         
-        self.buttons.append(Button(pos,size,_onclick,self.color,self.hover_color,self.outline_color,_text,_font,_font_size,self.outline_width))
+        self.buttons.append(Button(pos, size, _onclick, _color, self.hover_color, self.outline_color, _text, _font, _font_size, self.outline_width))
         
     def draw(self):
         screen = pygame.display.get_surface()
