@@ -4,10 +4,9 @@ import math
 import sys
 import time
 
-def saturation(img:Image, value:float) -> Image:
+def saturation(img_arr:np.ndarray, value:float) -> np.ndarray:
     value = float(value)
         
-    img_arr = np.array(img)
     lum_arr = np.zeros(img_arr.shape)
     
     l_1_c = 0.3 * img_arr[:,:,0] + 0.59*img_arr[:,:,1] + 0.11*img_arr[:,:,2]
@@ -16,13 +15,16 @@ def saturation(img:Image, value:float) -> Image:
     img_arr = value * img_arr + (1-value) * lum_arr
     
     img_arr = np.clip(img_arr, 0, 255)
-    return Image.fromarray(img_arr.astype(np.uint8))
+    return img_arr
 
-if __name__ == "__main__": # Time test code
-    rn = time.time()
-    img = Image.open("test/time-transfixed.jpg")
-
-    saturation(img,1).save("test/joe.png")
-    print(time.time()-rn)
+# Takes 0.353 seconds -- That's FAST
+if __name__ == "__main__":
+    from img_io import *
+    img_arr = img_to_arr(open_img("test/chicken.webp"))
     
-    # on Om's computer, saturation takes 0.594005823135376 seconds (That's pretty FAST)
+    start = time.time()
+    new_img_arr = saturation(img_arr,5)
+    end = time.time()
+    
+    arr_to_img(new_img_arr).save("test/output.png")
+    print(str(end-start) + " seconds")

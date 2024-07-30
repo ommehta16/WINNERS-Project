@@ -5,7 +5,7 @@ import sys
 from multiprocessing import Pool
 import time
 
-def conv_1_chnl(chl:np.array,conv:np.array) -> np.array:
+def conv_1_chnl(chl:np.ndarray,conv:np.ndarray) -> np.ndarray:
     conv_x = conv.shape[1]
     conv_y = conv.shape[0]
     
@@ -16,10 +16,11 @@ def conv_1_chnl(chl:np.array,conv:np.array) -> np.array:
         for x in range(new_chl.shape[1]):
             curr_block = chl[y:y+conv_y,x:x+conv_x]
             new_chl[y,x] = np.multiply(curr_block,conv).sum()
+    
+    new_chl = new_chl.clip(0,255)
     return new_chl
 
-def convolute(img,conv:np.array) -> Image:
-    img_arr = np.array(img).astype(int)
+def convolute(img_arr: np.ndarray,conv: np.ndarray) -> np.ndarray:
     
     new_img = np.zeros(img_arr.shape).astype(int)
     # mp = ~33% speed improvement on convolution
@@ -29,11 +30,11 @@ def convolute(img,conv:np.array) -> Image:
         new_img[:,:,i] = chnl_list[i] 
     
     new_img = new_img.clip(0,255)
-    return Image.fromarray(new_img.astype(np.uint8))
+    return new_img
 
 class Blur:
     
-    def generate_gauss_kernel(rad,sigma) -> np.array:
+    def generate_gauss_kernel(rad,sigma) -> np.ndarray:
         arr = np.zeros((2*rad+1,2*rad+1))
         inv_sigma = 1/sigma
         d_squared = lambda x,y: x**2 + y**2
@@ -44,42 +45,45 @@ class Blur:
                 
         return arr/arr.sum()
 
-    def gaussian(img:Image,radius:float,sigma:float) -> Image:
+    def gaussian(img: np.ndarray,radius:float,sigma:float) -> np.ndarray:
         img = convolute(img,Blur.generate_gauss_kernel(radius,sigma))
         
         return img
     
-    def box(img:Image, size:float) -> Image:
-        def generate_kernel(rad) -> np.array:
+    def box(img: np.ndarray, size:float) -> np.ndarray:
+        def generate_kernel() -> np.ndarray:
             arr = np.array(1,(size*2+1,size*2+1))
             arr = arr * 1/(size*2+1)**2
             return arr
         
-        img = convolute(img,generate_kernel(size))
+        img = convolute(img,generate_kernel())
         
         return img
     
     
 class EdgeDetect:
-    def dog(img:Image,r1:float,r2:float,prominence:float) -> Image:
-        def grayscale(image:np.array) -> np.array:
+    def dog(img: np.ndarray,r1:float,r2:float,prominence:float) -> np.ndarray:
+        def grayscale(image: np.ndarray) -> np.ndarray:
             img = 0.3 * image[:,:,0] + 0.59*image[:,:,1] + 0.11*image[:,:,2]
             return img
         
         flt = prominence*20*(Blur.generate_gauss_kernel(16,r1)-Blur.generate_gauss_kernel(16,r2))
         
         img = convolute(img,flt)
-        img = Image.fromarray(np.clip(grayscale(np.array(img).astype(int)),0,255).astype(np.uint8))
+        img = grayscale(np.array(img).astype(int))
+        
+        img = np.clip(img,0,255)
         return img
-    def mono_dog(img:Image,r1:float,r2:float,prominence:float) -> Image:
+    
+    def mono_dog(img: np.ndarray,r1:float,r2:float,prominence:float) -> np.ndarray:
         flt = prominence*20*(Blur.generate_gauss_kernel(16,r1)-Blur.generate_gauss_kernel(16,r2))
         
-        img_arr = conv_1_chnl(np.array(img).astype(int),flt)
-        img = Image.fromarray(np.clip(img_arr,0,255).astype(np.uint8))
+        img_arr = conv_1_chnl(img,flt)
+        img = np.clip(img_arr,0,255)
         return img
     
     
-if __name__ == "__main__":
+'''if __name__ == "__main__":
     rn = time.time()
     img = Image.open("test/time-transfixed.jpg")
 
@@ -99,4 +103,16 @@ if __name__ == "__main__":
     img = Image.fromarray(np.clip(original_arr,0,255).astype(np.uint8))
     img.save("test/goofed.png")
 
-    print(time.time()-rn)
+    print(time.time()-rn)'''
+
+# Takes 36.110 seconds -- That's SLOW
+if __name__ == "__main__":
+    from img_io import *
+    img_arr = img_to_arr(open_img("test/chicken.webp"))
+    
+    start = time.time()
+    new_img_arr = EdgeDetect.dog(img_arr,2,1.5,2.5)
+    end = time.time()
+    
+    arr_to_img(new_img_arr).save("test/output.png")
+    print(str(end-start) + " seconds")

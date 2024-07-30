@@ -1,0 +1,15 @@
+from PIL import Image
+import numpy as np
+
+
+def img_to_arr(image:Image.Image) -> np.ndarray:
+    return np.array(image).astype(int)
+
+def arr_to_img(image_array:np.ndarray) -> Image.Image :
+    return Image.fromarray(np.clip(image_array,0,255).astype(np.uint8))
+
+def open_img(file_name:str) -> Image.Image :
+    return Image.open(file_name,"r")
+
+def save_img(image:Image.Image, file_name:str) -> None:
+    image.save(file_name)

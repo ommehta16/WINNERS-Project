@@ -3,22 +3,20 @@ import numpy as np
 import time
 
 
-def brightness(image:Image, change:float) -> Image:
-    img = np.array(image).astype(int)
-
+def brightness(img:np.array, change:float) -> np.array:
     img+=change
-    
     img = np.clip(img,0,255)
-    return Image.fromarray(img.astype(np.uint8))
+    return img
 
-if __name__ == "__main__": # Time test code
-    rn = time.time()
-    img = Image.open("test/time-transfixed.jpg")
-
-    brightness(img,200).save("test/joe.png")
-    print(time.time()-rn)
+# Takes 0.060 seconds -- that's FAST
+if __name__ == "__main__":
+    from img_io import *
+    img_arr = img_to_arr(open_img("test/chicken.webp"))
     
-    # on Om's computer, brightness takes 0.19944024085998535 seconds (That's FAST!)
-
-
+    start = time.time()
+    new_img_arr = brightness(img_arr,200)
+    end = time.time()
+    
+    arr_to_img(new_img_arr).save("test/output.png")
+    print(str(end-start) + " seconds")
 

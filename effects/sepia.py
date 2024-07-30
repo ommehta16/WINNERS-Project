@@ -4,11 +4,9 @@ import math
 import sys
 import time
 
-def sepia(img: Image, intensity: float) -> Image:
+def sepia(image: np.ndarray, intensity: float) -> np.ndarray:
     
     intensity = min(1,max(0,intensity))
-
-    image = np.array(img).astype(int)
 
     # values taken from https://yabirgb.com/sepia_filter/
 
@@ -21,13 +19,16 @@ def sepia(img: Image, intensity: float) -> Image:
 
     new_image = (image * (1 - intensity) + new_image * intensity).astype(np.uint8)
 
-    return Image.fromarray(new_image)
+    return new_image
 
-if __name__ == "__main__": # Time test code
-    rn = time.time()
-    img = Image.open("test/time-transfixed.jpg")
-
-    sepia(img,1.6).save("test/joe.png")
-    print(time.time()-rn)
+# Takes 0.411 seconds -- That's pretty FAST
+if __name__ == "__main__":
+    from img_io import *
+    img_arr = img_to_arr(open_img("test/chicken.webp"))
     
-    # on Om's computer, saturation takes 0.7326478958129883 seconds (That's fairly FAST)
+    start = time.time()
+    new_img_arr = sepia(img_arr,0.5)
+    end = time.time()
+    
+    arr_to_img(new_img_arr).save("test/output.png")
+    print(str(end-start) + " seconds")

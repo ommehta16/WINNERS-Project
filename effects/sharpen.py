@@ -6,7 +6,7 @@ import time
 from multiprocessing import Pool
 
 
-def sharpen_chnl(chl,filt,intense):
+def sharpen_chnl(chl:np.ndarray,filt:np.ndarray,intense) -> np.ndarray:
     sharp_chl = np.zeros_like(chl,dtype=float)
     for y in range(intense // 2, chl.shape[0] - intense // 2):
         for x in range(intense // 2, chl.shape[1] - intense // 2):
@@ -15,9 +15,7 @@ def sharpen_chnl(chl,filt,intense):
                     ] += chl[y, x] * filt
     return sharp_chl
 
-def sharpen(img:Image, intensity:float, power:float) -> Image:
-    image = np.array(img).astype(int)
-    image = np.clip(image, 0, 255)
+def sharpen(image, intensity:float, power:float) -> np.ndarray:
     new_image = np.array(image)
 
     intensity = max(1, round(intensity) * 2 + 1)
@@ -38,13 +36,17 @@ def sharpen(img:Image, intensity:float, power:float) -> Image:
 
     sharpened_img = sharpened_img[intensity // 2:new_image.shape[0] - intensity // 2,
                                   intensity // 2:new_image.shape[1] - intensity // 2]
-    return Image.fromarray(np.clip(sharpened_img, 0, 255).astype(np.uint8))
+    sharpened_img = np.clip(sharpened_img, 0, 255)
+    return sharpened_img
 
-if __name__ == "__main__": # Time test code
-    rn = time.time()
-    img = Image.open("test/time-transfixed.jpg")
-
-    sharpen(img,1,1).save("test/joe.png")
-    print(time.time()-rn)
+# Takes 25.406 seconds -- That's kinda SLOW
+if __name__ == "__main__":
+    from img_io import *
+    img_arr = img_to_arr(open_img("test/chicken.webp"))
     
-    # on Om's computer, sharpening takes 8.622666835784912 seconds (That's pretty meh)
+    start = time.time()
+    new_img_arr = sharpen(img_arr,2,2)
+    end = time.time()
+    
+    arr_to_img(new_img_arr).save("test/output.png")
+    print(str(end-start) + " seconds")
