@@ -42,7 +42,7 @@ def dither_linear(img:np.ndarray,color:bool) -> np.ndarray:
         for x in range(new_img.shape[1]):
             if (img[y,x] > filter[y % filter.shape[0],x % filter.shape[1]]):
                 new_img[y,x] = 255
-    return new_img
+    return chnl_1_to_3(new_img)
 
 def dither_parallel(img:np.ndarray,color:bool) -> np.ndarray:
     def grayscale(img):
