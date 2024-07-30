@@ -10,32 +10,31 @@ import effects.brightness
 import effects.hue
 from ui import ui_elements
 
-
 def dist(a, b):
     return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
 
 # Define functions for each button action
-def blur_action(img:np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
+def blur_action(img: np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
     img = effects.convolute.Blur.gaussian(img, 16, slider.get_value())
     return img
 
-def contrast_action(img:np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
+def contrast_action(img: np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
     pass # Implement contrast effect
     return img
 
-def dither_action(img:np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
-    img = effects.dither.dither(img,bool(slider.get_value()))
+def dither_action(img: np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
+    img = effects.dither.dither(img, bool(slider.get_value()))
     return img
 
-def sharpen_action(img:np.ndarray, slider: ui_elements.Slider, slider2: ui_elements.Slider) -> np.ndarray:
+def sharpen_action(img: np.ndarray, slider: ui_elements.Slider, slider2: ui_elements.Slider) -> np.ndarray:
     effects.sharpen.sharpen(img, slider.get_value(), slider2.get_value())
     return img
 
-def sepia_action(img:np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
+def sepia_action(img: np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
     effects.sepia.sepia(img, slider.get_value())
     return img
 
-def soften_action(img:np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
+def soften_action(img: np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
     pass
     return img
 
@@ -44,15 +43,15 @@ def brightness_action(img, slider: ui_elements.Slider):
     img = effects.brightness.brightness(img, change)
     return img
 
-def dog_action(img:np.ndarray, slider: ui_elements.Slider, slider2: ui_elements.Slider, slider3: ui_elements.Slider) -> np.ndarray:
+def dog_action(img: np.ndarray, slider: ui_elements.Slider, slider2: ui_elements.Slider, slider3: ui_elements.Slider) -> np.ndarray:
     effects.convolute.EdgeDetect.dog(img, slider.get_value(), slider2.get_value(), slider3.get_value())
     return img
 
-def hue_action(img:np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
+def hue_action(img: np.ndarray, slider: ui_elements.Slider) -> np.ndarray:
     effects.hue.hue(img, slider.get_value())
     return img
 
-def numpy_to_pygame(np_img:np.ndarray) -> pygame.Surface:
+def numpy_to_pygame(np_img: np.ndarray) -> pygame.Surface:
     return effects.img_io.pil_to_pyg(effects.img_io.arr_to_img(np_img))
 
 def main():
@@ -106,24 +105,22 @@ def main():
     img = effects.img_io.open_img("test/mountain.jpeg")
     img_arr = effects.img_io.img_to_arr(img)
     
-    img_rat = img.size[1]/img.size[0]
-    img_max = (screen.get_size()[0] - side_bar.rect.right,screen.get_size()[1] -title_bar.rect.bottom)
+    img_rat = img.size[1] / img.size[0]
+    img_max = (screen.get_size()[0] - side_bar.rect.right, screen.get_size()[1] - title_bar.rect.bottom)
     preview_rect = pygame.Rect(side_bar.rect.right, title_bar.rect.bottom,
-                            min(img_max[0],img_max[1]/img_rat),
-                            min(img_max[1],img_max[0]*img_rat)
-                            )
-    preview_rect.center = (side_bar.rect.right + (screen.get_width()-side_bar.rect.right)/2, title_bar.rect.bottom + (screen.get_height()-title_bar.rect.bottom)/2)
-    # Create a surface for the image preview
-    preview_rect = pygame.Rect(side_bar.rect.right, title_bar.rect.bottom, screen.get_size()[0] - side_bar.rect.right, screen.get_size()[1] - title_bar.rect.bottom)
-    pygame_preview_image = numpy_to_pygame(original_image)  # Display the original image initially
-    pygame_preview_image = pygame.transform.scale(pygame_preview_image, (preview_rect.width, preview_rect.height))
+                               min(img_max[0], img_max[1] / img_rat),
+                               min(img_max[1], img_max[0] * img_rat)
+                              )
+    preview_rect.center = (side_bar.rect.right + (screen.get_width() - side_bar.rect.right) / 2,
+                           title_bar.rect.bottom + (screen.get_height() - title_bar.rect.bottom) / 2)
+
+    # Initialize view_img
+    view_img = pygame.transform.scale(effects.img_io.pil_to_pyg(img), preview_rect.size)
 
     def update_preview():
-        nonlocal pygame_preview_image
         if active_effect_function:
             new_img = active_effect_function(preview_image.copy(), slider)
-            pygame_preview_image = numpy_to_pygame(new_img)
-            pygame_preview_image = pygame.transform.scale(pygame_preview_image, (preview_rect.width, preview_rect.height))
+            return numpy_to_pygame(new_img)
 
     # Main loop
     while running:
@@ -139,28 +136,28 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 clicked = True
             if event.type == pygame.VIDEORESIZE:  # Handle window resizing
-
-                squished = pygame.transform.scale(screen,(max(event.w,600), max(event.h,400)))
-                screen = pygame.display.set_mode((max(event.w,600), max(event.h,400)), pygame.RESIZABLE)
+                squished = pygame.transform.scale(screen, (max(event.w, 600), max(event.h, 400)))
+                screen = pygame.display.set_mode((max(event.w, 600), max(event.h, 400)), pygame.RESIZABLE)
                 screen.fill(background_color)
                 pygame.display.update()
-                side_bar.rect.update(side_bar.rect.left,side_bar.rect.top,screen.get_size()[0] * 1/4, screen.get_size()[1] - title_bar.rect.bottom)
+                side_bar.rect.update(side_bar.rect.left, side_bar.rect.top, screen.get_size()[0] * 1 / 4, screen.get_size()[1] - title_bar.rect.bottom)
                 
-                
-                img_rat = img.size[1]/img.size[0]
-                img_max = (screen.get_size()[0] - side_bar.rect.right,screen.get_size()[1] -title_bar.rect.bottom)
+                img_rat = img.size[1] / img.size[0]
+                img_max = (screen.get_size()[0] - side_bar.rect.right, screen.get_size()[1] - title_bar.rect.bottom)
                 preview_rect = pygame.Rect(side_bar.rect.right, title_bar.rect.bottom,
-                                        min(img_max[0],img_max[1]/img_rat),
-                                        min(img_max[1],img_max[0]*img_rat)
-                                        )
-                preview_rect.center = (side_bar.rect.right + (screen.get_width()-side_bar.rect.right)/2, title_bar.rect.bottom + (screen.get_height()-title_bar.rect.bottom)/2)
-                view_img = pygame.transform.scale(effects.img_io.pil_to_pyg(img),preview_rect.size)
+                                           min(img_max[0], img_max[1] / img_rat),
+                                           min(img_max[1], img_max[0] * img_rat)
+                                          )
+                preview_rect.center = (side_bar.rect.right + (screen.get_width() - side_bar.rect.right) / 2,
+                                       title_bar.rect.bottom + (screen.get_height() - title_bar.rect.bottom) / 2)
+                view_img = pygame.transform.scale(effects.img_io.pil_to_pyg(img), preview_rect.size)
                 skip_frame = True
             slider.handle_event(event)
         
         # Update preview image if the slider is moved and an effect is active
         if active_effect_function:
-            update_preview()
+            view_img = update_preview()
+            view_img = pygame.transform.scale(view_img, (preview_rect.width, preview_rect.height))
 
         if skip_frame:
             continue
@@ -176,13 +173,10 @@ def main():
         slider.draw(screen)
         
         # Draw the image preview
-        screen.blit(view_img,preview_rect.topleft)
+        screen.blit(view_img, preview_rect.topleft)
         
-        clock.tick(60)
+        clock.tick(30)
         pygame.display.flip()
-        print(slider.get_value())
-
-    pygame.quit()
 
 if __name__ == "__main__":
     main()
