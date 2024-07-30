@@ -20,16 +20,12 @@ def main():
     running = True
     frame = 0
 
-    # TEMP --> 
     title_bar = ui_elements.ButtonGrid([0, 0], [screen.get_size()[0], 20], [0, 1])
-    side_bar = ui_elements.ButtonGrid([0, 20], [screen.get_size()[0] / 6, screen.get_size()[1] - 20], [1, 9])  # Adjusted grid size for buttons
+    side_bar = ui_elements.ButtonGrid([0, 20], [screen.get_size()[0] * 1/4, screen.get_size()[1] - 20], [2, 5], hov_col=(0,114,182),col=(0,174,239))
 
     title_bar.add_button(_text="REPRODUCE", _onclick=lambda: title_bar.add_button(_onclick=lambda: print(ui_elements.Prompt.get_file_open()), _text="open file..."))
-    side_bar.add_button(_text="REPRODUCE", _onclick=lambda: 0, _minor_axis_size_spec=side_bar.size[0] / 2)
-    side_bar.buttons[0].set_image("images/ex.png")
 
-    # <-- TEMP
-    slider = ui_elements.Slider((400, 500), (200, 20), 0.5, 0, 100)
+    slider = ui_elements.Slider((800, 500), (200, 20), 0.5, 0, 100)
 
     # Create the sidebar buttons
     side_bar_buttons = [
@@ -45,11 +41,11 @@ def main():
     ]
     
     for action, image_path, text in side_bar_buttons:
-        side_bar.add_button(_onclick=action, _text=text, _color=(0, 174, 239))  # Use RGB tuple for color
+        side_bar.add_button(_onclick=action, _text=text, _font_size=20)  # Use RGB tuple for color
         side_bar.buttons[-1].set_image(image_path)  # Set the image for the button
 
     # Create a surface for the image preview
-    preview_rect = pygame.Rect(screen.get_size()[0] / 6 + 20, 20, screen.get_size()[0] * 5 / 6 - 40, screen.get_size()[1] - 40)
+    preview_rect = pygame.Rect(side_bar.rect.right, title_bar.rect.bottom, screen.get_size()[0] - side_bar.rect.right, screen.get_size()[1] -title_bar.rect.bottom)
     preview_image = pygame.image.load("images/icons/effects/sharpen.png")  # Load your preview image here
     preview_image = pygame.transform.scale(preview_image, (preview_rect.width, preview_rect.height))
 
@@ -67,8 +63,10 @@ def main():
                 clicked = True
             if event.type == pygame.VIDEORESIZE:  # Handle window resizing
                 screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
-                preview_rect = pygame.Rect(screen.get_size()[0] / 6 + 20, 20, screen.get_size()[0] * 5 / 6 - 40, screen.get_size()[1] - 40)
+                side_bar.rect.update(side_bar.rect.left,side_bar.rect.top,screen.get_size()[0] * 1/4, screen.get_size()[1] - title_bar.rect.bottom)
+                preview_rect = pygame.Rect(side_bar.rect.right, title_bar.rect.bottom, screen.get_size()[0] - side_bar.rect.right, screen.get_size()[1] -title_bar.rect.bottom)
                 preview_image = pygame.transform.scale(preview_image, (preview_rect.width, preview_rect.height))
+
             slider.handle_event(event)
 
         # UPDATE EVERYTHING
