@@ -41,7 +41,8 @@ def soften_action(img, slider: ui_elements.Slider):
     return img
 
 def brightness_action(img, slider: ui_elements.Slider):
-    effects.brightness.brightness(img, slider.get_value())
+    change = slider.get_value()
+    img = effects.brightness.brightness(img, change)
     return img
 
 def dog_action(img, slider: ui_elements.Slider, slider2: ui_elements.Slider, slider3: ui_elements.Slider):
@@ -78,20 +79,28 @@ def main():
     slider = ui_elements.Slider((side_bar.rect.width // 2, side_bar.rect.bottom - 50), (side_bar.rect.width - 40, 20), 0, 0, 100)
 
     # Load original image and convert to numpy array
-    original_image = np.array(Image.open("images/icons/effects/sharpen.png"))
+    original_image = np.array(Image.open("/Users/armaanthadani/Desktop/Work/Tufts/Final_Project/WINNERS-Project/test/mountain.JPEG"))
     preview_image = original_image.copy()
+
+    # Variable to store the currently active effect function
+    active_effect_function = None
+
+    def set_active_effect(effect_function):
+        nonlocal active_effect_function
+        active_effect_function = effect_function
+        update_preview()  # Update the preview immediately when the effect is selected
 
     # Create the sidebar buttons
     side_bar_buttons = [
-        (lambda: update_preview(blur_action, preview_image, slider), "images/icons/effects/blur.png", "Blur"),
-        (lambda: update_preview(contrast_action, preview_image, slider), "images/icons/effects/contrast.png", "Contrast"),
-        (lambda: update_preview(dither_action, preview_image, slider), "images/icons/effects/dither.png", "Dither"),
-        (lambda: update_preview(sharpen_action, preview_image, slider, slider), "images/icons/effects/sharpen.png", "Sharpen"),
-        (lambda: update_preview(sepia_action, preview_image, slider), "images/icons/effects/sepia.png", "Sepia"),
-        (lambda: update_preview(soften_action, preview_image, slider), "images/icons/effects/soften.png", "Soften"),
-        (lambda: update_preview(brightness_action, preview_image, slider), "images/icons/effects/brightness.png", "Brightness"),
-        (lambda: update_preview(dog_action, preview_image, slider, slider, slider), "images/icons/effects/dog.png", "Dog"),
-        (lambda: update_preview(hue_action, preview_image, slider), "images/icons/effects/hue.png", "Hue")
+        (lambda: set_active_effect(lambda img, slider: blur_action(img, slider)), "images/icons/effects/blur.png", "Blur"),
+        (lambda: set_active_effect(lambda img, slider: contrast_action(img, slider)), "images/icons/effects/contrast.png", "Contrast"),
+        (lambda: set_active_effect(lambda img, slider: dither_action(img, slider)), "images/icons/effects/dither.png", "Dither"),
+        (lambda: set_active_effect(lambda img, slider: sharpen_action(img, slider, slider)), "images/icons/effects/sharpen.png", "Sharpen"),
+        (lambda: set_active_effect(lambda img, slider: sepia_action(img, slider)), "images/icons/effects/sepia.png", "Sepia"),
+        (lambda: set_active_effect(lambda img, slider: soften_action(img, slider)), "images/icons/effects/soften.png", "Soften"),
+        (lambda: set_active_effect(lambda img, slider: brightness_action(img, slider)), "images/icons/effects/brightness.png", "Brightness"),
+        (lambda: set_active_effect(lambda img, slider: dog_action(img, slider, slider, slider)), "images/icons/effects/dog.png", "Dog"),
+        (lambda: set_active_effect(lambda img, slider: hue_action(img, slider)), "images/icons/effects/hue.png", "Hue")
     ]
     
     for action, image_path, text in side_bar_buttons:
@@ -100,14 +109,15 @@ def main():
 
     # Create a surface for the image preview
     preview_rect = pygame.Rect(side_bar.rect.right, title_bar.rect.bottom, screen.get_size()[0] - side_bar.rect.right, screen.get_size()[1] - title_bar.rect.bottom)
-    pygame_preview_image = numpy_to_pygame(preview_image)
+    pygame_preview_image = numpy_to_pygame(original_image)  # Display the original image initially
     pygame_preview_image = pygame.transform.scale(pygame_preview_image, (preview_rect.width, preview_rect.height))
 
-    def update_preview(effect_function, img, *args):
+    def update_preview():
         nonlocal pygame_preview_image
-        new_img = effect_function(img.copy(), *args)
-        pygame_preview_image = numpy_to_pygame(new_img)
-        pygame_preview_image = pygame.transform.scale(pygame_preview_image, (preview_rect.width, preview_rect.height))
+        if active_effect_function:
+            new_img = active_effect_function(preview_image.copy(), slider)
+            pygame_preview_image = numpy_to_pygame(new_img)
+            pygame_preview_image = pygame.transform.scale(pygame_preview_image, (preview_rect.width, preview_rect.height))
 
     # Main loop
     while running:
@@ -129,6 +139,10 @@ def main():
 
             slider.handle_event(event)
 
+        # Update preview image if the slider is moved and an effect is active
+        if active_effect_function:
+            update_preview()
+
         # UPDATE EVERYTHING
         title_bar.update(clicked)
         side_bar.update(clicked)
@@ -145,7 +159,7 @@ def main():
         
         clock.tick(60)
         pygame.display.flip()
-        
+        print(slider.get_value())
 
     pygame.quit()
 

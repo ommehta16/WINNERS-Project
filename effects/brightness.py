@@ -1,22 +1,15 @@
 from PIL import Image
 import numpy as np
-import time
 
-
-def brightness(img:np.array, change:int) -> np.array:
-    img+=change
-    img = np.clip(img,0,255)
-    return img
-
-# Takes 0.060 seconds -- that's FAST
-if __name__ == "__main__":
-    from img_io import *
-    img_arr = img_to_arr(open_img("test/chicken.webp"))
+def brightness(img: np.array, change: int) -> np.array:
+    # Ensure change is within the range -255 to 255
+    change = np.clip(change, -255, 255)
     
-    start = time.time()
-    new_img_arr = brightness(img_arr,200)
-    end = time.time()
+    # Convert the image to int16 to prevent overflow, and make the change
+    img = img.astype(np.int16) + change
     
-    arr_to_img(new_img_arr).save("test/output.png")
-    print(str(end-start) + " seconds")
+    # Clip the values to be in the range 0-255
+    img = np.clip(img, 0, 255)
+    return img.astype(np.uint8)  # Convert back to uint8
+
 

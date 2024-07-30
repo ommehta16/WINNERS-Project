@@ -3,50 +3,25 @@ import numpy as np
 import math
 import sys
 import time
-from multiprocessing import Pool
+from scipy.ndimage import convolve
 
-
-def sharpen_chnl(chl:np.ndarray,filt:np.ndarray,intense) -> np.ndarray:
-    sharp_chl = np.zeros_like(chl,dtype=float)
-    for y in range(intense // 2, chl.shape[0] - intense // 2):
-        for x in range(intense // 2, chl.shape[1] - intense // 2):
-            sharp_chl[y-intense//2:y+intense//2 + 1,
-                            x-intense//2:x+intense//2 + 1
-                    ] += chl[y, x] * filt
-    return sharp_chl
-
-def sharpen(image, intensity:float, power:float) -> np.ndarray:
+def sharpen(image, intensity: float, power: float) -> np.ndarray:
     new_image = np.array(image)
 
     intensity = max(1, round(intensity) * 2 + 1)
-    # logic taken from https://blog.demofox.org/2022/02/26/image-sharpening-convolution-kernels/
+    # Logic taken from https://blog.demofox.org/2022/02/26/image-sharpening-convolution-kernels/
     blur_filter = np.zeros((intensity, intensity))
     identity = blur_filter.copy()
     identity[intensity // 2, intensity // 2] = 1 + power
 
-    blur_filter = (blur_filter + 1) * (1/intensity**2)
+    blur_filter = (blur_filter + 1) * (1 / intensity ** 2)
     filter = identity - blur_filter * power
-    new_image = np.pad(new_image, ((intensity // 2,), (intensity // 2,), (0,)))
+
     sharpened_img = np.zeros_like(new_image, dtype=float)
     
-    with Pool() as pool:
-        chnl_list = pool.starmap(sharpen_chnl,[(new_image[:,:,c],filter,intensity) for c in range(3)])
+    # Apply convolution for each channel
     for c in range(3):
-        sharpened_img[:,:,c] = chnl_list[c]
-
-    sharpened_img = sharpened_img[intensity // 2:new_image.shape[0] - intensity // 2,
-                                  intensity // 2:new_image.shape[1] - intensity // 2]
+        sharpened_img[:, :, c] = convolve(new_image[:, :, c], filter, mode='reflect')
+    
     sharpened_img = np.clip(sharpened_img, 0, 255)
-    return sharpened_img
-
-# Takes 25.406 seconds -- That's kinda SLOW
-if __name__ == "__main__":
-    from img_io import *
-    img_arr = img_to_arr(open_img("test/chicken.webp"))
-    
-    start = time.time()
-    new_img_arr = sharpen(img_arr,2,2)
-    end = time.time()
-    
-    arr_to_img(new_img_arr).save("test/output.png")
-    print(str(end-start) + " seconds")
+    return sharpened_img.astype(np.uint8)
