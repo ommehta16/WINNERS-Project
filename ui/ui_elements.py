@@ -157,7 +157,13 @@ class Slider:
     def draw(self, screen):
         
         pygame.draw.rect(screen, (200, 200, 200), self.container_rect)  
-        pygame.draw.rect(screen, (100, 100, 100), self.button_rect)  
+        pygame.draw.rect(screen, (100, 100, 100), self.button_rect)
+    
+    def get_value(self):
+        val_range = self.slider_right_pos - self.slider_left_pos
+        button_val = self.button_rect.centerx - self.slider_left_pos
+
+        return(button_val/val_range)*(self.max-self.min)+self.min
         
         
 

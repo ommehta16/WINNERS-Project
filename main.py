@@ -80,6 +80,7 @@ def main():
         
         title_bar.draw()
         side_bar.draw()
+        slider.draw(screen)
         
         
         # Draw the image preview
@@ -87,6 +88,7 @@ def main():
         
         clock.tick(60)
         pygame.display.flip()
+        
 
     pygame.quit()
 
