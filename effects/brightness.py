@@ -3,7 +3,7 @@ import numpy as np
 import time
 
 
-def brightness(img:np.array, change:float) -> np.array:
+def brightness(img:np.array, change:int) -> np.array:
     img+=change
     img = np.clip(img,0,255)
     return img
