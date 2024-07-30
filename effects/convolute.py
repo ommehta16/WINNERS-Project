@@ -64,7 +64,9 @@ class Blur:
 class EdgeDetect:
     def dog(img: np.ndarray,r1:float,r2:float,prominence:float) -> np.ndarray:
         def grayscale(image: np.ndarray) -> np.ndarray:
-            img = 0.3 * image[:,:,0] + 0.59*image[:,:,1] + 0.11*image[:,:,2]
+            img = np.zeros(image.shape)
+            for c in range(3):
+                img[:,:,c] = 0.3 * image[:,:,0] + 0.59*image[:,:,1] + 0.11*image[:,:,2]
             return img
         
         flt = prominence*20*(Blur.generate_gauss_kernel(16,r1)-Blur.generate_gauss_kernel(16,r2))
@@ -108,10 +110,10 @@ class EdgeDetect:
 # Takes 36.110 seconds -- That's SLOW
 if __name__ == "__main__":
     from img_io import *
-    img_arr = img_to_arr(open_img("test/chicken.webp"))
+    img_arr = img_to_arr(open_img("test/time-transfixed.jpg"))
     
     start = time.time()
-    new_img_arr = EdgeDetect.dog(img_arr,2,1.5,2.5)
+    new_img_arr = Blur.gaussian(img_arr,16,2)
     end = time.time()
     
     arr_to_img(new_img_arr).save("test/output.png")
