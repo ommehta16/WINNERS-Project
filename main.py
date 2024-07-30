@@ -10,13 +10,12 @@ import effects.brightness
 import effects.hue
 from ui import ui_elements
 
-
 def dist(a, b):
     return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
 
 BACKGROUND_COLOR = (245, 255, 250)  # Use RGB tuple instead of hex color
 
-def numpy_to_pygame(np_img:np.ndarray) -> pygame.Surface:
+def numpy_to_pygame(np_img: np.ndarray) -> pygame.Surface:
     return effects.img_io.pil_to_pyg(effects.img_io.arr_to_img(np_img))
 
 def main():
@@ -108,6 +107,7 @@ def main():
         slider.draw(screen)
         screen.blit(view_img,preview_rect.topleft)
         
+        clock.tick(30)
         clock.tick(30)
         pygame.display.flip()
 
