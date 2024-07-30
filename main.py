@@ -7,7 +7,10 @@ import effects.convolute
 import effects.dither
 import effects.img_io
 import effects.brightness
-import effects.hue
+# import effects.hue
+import effects.sepia
+import effects.sharpen
+# import effects.soften
 from ui import ui_elements
 
 def dist(a, b):
@@ -52,15 +55,39 @@ def main():
     def dog():
         nonlocal img_arr
         img_arr = effects.convolute.EdgeDetect.dog(img_arr,2,1.5,2.5)
+    
+    def contrast():
+        nonlocal img_arr
+        img_arr = effects.convolute.Blur.gaussian(img_arr,16,(slider.get_value()/2)+0.01)
+    
+    def brightness():
+        nonlocal img_arr
+        img_arr = effects.brightness.brightness(img_arr,slider.get_value())
+    
+    def sharpen():
+        nonlocal img_arr
+        img_arr = effects.sharpen.sharpen(img_arr,slider.get_value(),1)
+    
+    def dither():
+        nonlocal img_arr
+        img_arr = effects.convolute.Blur.gaussian(img_arr,16,(slider.get_value()/2)+0.01)
+    
+    def sepia():
+        nonlocal img_arr
+        img_arr = effects.sepia.sepia(img_arr,slider.get_value())
+    
+    # def soften():
+    #     nonlocal img_arr
+    #     img_arr = effects.soften.soften(img_arr,slider.get_value())
 
     side_bar_buttons = [
         (blur, "images/icons/effects/blur.png", "Blur"),
-        (lambda: 0, "images/icons/effects/contrast.png", "Contrast"),
-        (lambda: 0, "images/icons/effects/dither.png", "Dither"),
-        (lambda: 0, "images/icons/effects/sharpen.png", "Sharpen"),
-        (lambda: 0, "images/icons/effects/sepia.png", "Sepia"),
+        (contrast, "images/icons/effects/contrast.png", "Contrast"),
+        (dither, "images/icons/effects/dither.png", "Dither"),
+        (sharpen, "images/icons/effects/sharpen.png", "Sharpen"),
+        (sepia, "images/icons/effects/sepia.png", "Sepia"),
         (lambda: 0, "images/icons/effects/soften.png", "Soften"),
-        (lambda: 0, "images/icons/effects/brightness.png", "Brightness"),
+        (brightness, "images/icons/effects/brightness.png", "Brightness"),
         (dog, "images/icons/effects/dog.png", "Dog"),
         (lambda: 0, "images/icons/effects/hue.png", "Hue")
     ]
