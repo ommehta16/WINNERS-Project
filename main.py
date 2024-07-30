@@ -77,9 +77,9 @@ def main():
         screen.fill(background_color)
         
         title_bar.draw()
-
         side_bar.draw()
-        slider.draw(screen)
+        
+        
         # Draw the image preview
         screen.blit(preview_image, preview_rect.topleft)
         
