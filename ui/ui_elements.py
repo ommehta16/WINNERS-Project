@@ -2,54 +2,55 @@ import time
 import pygame
 import sys
 from PyQt5.QtWidgets import QApplication, QFileDialog
+from typing import Tuple, List
 
 epsilon = float(0.00000000000001)
 class Button:
-    def __init__(self,_location:tuple[float],_size:tuple[float],_on_click,_color="gray",_hover_color="dark gray",_outline_color="black",_text="",_font="Calibri",_fontsize=12,outline_width=1):
+    def __init__(self, _location: Tuple[float, float], _size: Tuple[float, float], _on_click, _color="gray", _hover_color="darkgray", _outline_color="black", _text="", _font="Calibri", _fontsize=12, outline_width=1):
         self.location = _location
         self.size = _size
-        self.rect = pygame.rect.Rect(_location[0],_location[1],_size[0],_size[1])
+        self.rect = pygame.Rect(_location[0], _location[1], _size[0], _size[1])
         self.is_hovered = False
         self.color = _color
         self.hover_color = _hover_color
         self.outline_color = _outline_color
         self.on_click = _on_click
-        self.text=_text
-        self.font = pygame.font.SysFont(_font,_fontsize)
+        self.text = _text
+        self.font = pygame.font.SysFont(_font, _fontsize)
         self.outline_width = outline_width
-        self.image:pygame.Surface = None
+        self.image: pygame.Surface = None
         
     def draw(self):
         screen = pygame.display.get_surface()
-        if self.is_hovered: pygame.draw.rect(screen,self.hover_color,self.rect)
-        else: pygame.draw.rect(screen,self.color,self.rect)
-        pygame.draw.rect(screen,self.outline_color,self.rect,self.outline_width)
+        if self.is_hovered:
+            pygame.draw.rect(screen, self.hover_color, self.rect)
+        else:
+            pygame.draw.rect(screen, self.color, self.rect)
+        pygame.draw.rect(screen, self.outline_color, self.rect, self.outline_width)
+        
+        if self.image is not None:
+            image_x = self.rect.x + 5
+            screen.blit(self.image, (image_x, self.rect.y + (self.rect.height - self.image.get_height()) // 2))
+            text_x = image_x + self.image.get_width() + 10
+        else:
+            text_x = self.rect.x + 10
         
         if len(self.text):
-            text = self.font.render(self.text,True,self.outline_color)
-            screen.blit(text,(self.rect.centerx-text.get_size()[0]/2,self.rect.centery-text.get_size()[1]/2))
+            text = self.font.render(self.text, True, self.outline_color)
+            screen.blit(text, (text_x, self.rect.y + (self.rect.height - text.get_height()) // 2))
         
-        if self.image != None:
-            screen.blit(self.image,(self.rect.centerx-self.image.get_size()[0]/2,self.rect.centery-self.image.get_size()[1]/2))
-        
-    def update(self, click:bool):
+    def update(self, click: bool):
         mouse_pos = pygame.mouse.get_pos()
-        if self.rect.left < mouse_pos[0] and mouse_pos[0] < self.rect.right and self.rect.bottom > mouse_pos[1] and mouse_pos[1] > self.rect.top:
+        if self.rect.left < mouse_pos[0] < self.rect.right and self.rect.top < mouse_pos[1] < self.rect.bottom:
             self.is_hovered = True
             if click:
                 self.on_click()
-            
         else:
             self.is_hovered = False
-        
-        # TODO: DO THIS!!!
-        pass
     
-    def set_image(self, image_path:str):
-        self.text = ""
+    def set_image(self, image_path: str):
         self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image,(min(self.size[0],self.image.get_size()[0]),min(self.size[1],self.image.get_size()[1])))
-        
+        self.image = pygame.transform.scale(self.image, (self.rect.height - 10, self.rect.height - 10))
     
     
 class ButtonGrid:
