@@ -53,11 +53,12 @@ def main():
     def contrast():     nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(slider.get_value()/2)+0.01 )
     def brightness():   nonlocal img_arr; img_arr = effects.brightness.brightness   (img_arr,   slider.get_value()          )
     def sharpen():      nonlocal img_arr; img_arr = effects.sharpen.sharpen         (img_arr,   slider.get_value(),1        )
-    def dither():       nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(slider.get_value()/2)+0.01 )
+    def dither():       nonlocal img_arr; img_arr = effects.dither.dither_linear    (img_arr,False)
     def sepia():        nonlocal img_arr; img_arr = effects.sepia.sepia             (img_arr,   slider.get_value()          )
+    def undo():         nonlocal img_arr; img_arr = effects.img_io.img_to_arr(img).astype(int)
     # def soften(): nonlocal img_arr; img_arr = effects.soften.soften(img_arr,slider.get_value())
-    
     side_bar_buttons = [
+        (undo,"images/icons/effects/undo.png", "Undo"),
         (blur, "images/icons/effects/blur.png", "Blur"),
         (contrast, "images/icons/effects/contrast.png", "Contrast"),
         (dither, "images/icons/effects/dither.png", "Dither"),
@@ -68,6 +69,8 @@ def main():
         (dog, "images/icons/effects/dog.png", "Dog"),
         (lambda: 0, "images/icons/effects/hue.png", "Hue")
     ]
+
+
     preview_rect = pygame.Rect(1,1,1,1)
 
     for action, image_path, text in side_bar_buttons:
