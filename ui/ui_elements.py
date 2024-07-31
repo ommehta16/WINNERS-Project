@@ -34,12 +34,16 @@ class Button:
         elif self.rendered_text != None: screen.blit(self.rendered_text,(self.rect.centerx-self.rendered_text.get_size()[0]/2,max(self.rect.centery-self.rendered_text.get_height()/2,self.rect.top)))
         
     def update(self, click:bool):
+        did_action = False
+
         mouse_pos = pygame.mouse.get_pos()
         self.is_hovered = False
         if self.rect.left < mouse_pos[0] and mouse_pos[0] < self.rect.right and self.rect.bottom > mouse_pos[1] and mouse_pos[1] > self.rect.top:
             self.is_hovered = True
             if click:
+                did_action = True
                 self.on_click()
+
         
         if self.text:
             self.rendered_text = self.font.render(self.text,True,"black")
@@ -61,6 +65,7 @@ class Button:
             target_size = (min(max_w,max_h*ratio),min(max_h,max_w/ratio))
             if target_size[0] < 0 or target_size[1] < 1: self.image = pygame.transform.scale(self.image,(0,0))
             else: self.image = pygame.transform.scale(self.orig_image,target_size)
+        return did_action
 
     def update_font(self,size:int,font_name:str):
         self.font = pygame.font.SysFont(font_name,size)
@@ -87,7 +92,7 @@ class ButtonGrid:
     `loc` is the top-left, `grid_sz` controls the amount of grid spaces\n
     either `grid_sz[0]` or `grid_sz[1]` **must be > 0**
     '''
-    def __init__(self,loc:tuple[float],dims:tuple[float],grid_sz:tuple[int], bg_col="light gray",col="gray",hov_col="dark gray",outline_col="black",outline_width=1,font_size=12):
+    def __init__(self,loc:tuple[float],dims:tuple[float],grid_sz:tuple[int], bg_col="light gray",col="gray",hov_col="dark gray",outline_col="black",outline_width=1,font_size=12,buttons:list=[]):
         if max(grid_sz) <= 0: raise ValueError
         self.rect = pygame.rect.Rect(loc[0],loc[1],dims[0],dims[1])
         self.colors = {
@@ -96,11 +101,15 @@ class ButtonGrid:
             "outline": outline_col,
             "background": bg_col
         }
-
         self.outline_width = outline_width
         self.buttons:list[Button] = []
         self.grid_size:list[int] = [max(0,grid_sz[0]),max(0,grid_sz[1])]
         self.font_size = font_size
+
+        for action, image_path, text in buttons:
+            self.add_button(_onclick=action,_text=text,_font_size=font_size)
+            self.buttons[-1].set_image(image_path)
+
     def add_button(self, _onclick=lambda: 0, _text: str = "", _font: str = "Calibri", _font_size: int = 12):
         pos = self.rect.topleft
         prev_rect = None
@@ -126,8 +135,9 @@ class ButtonGrid:
         for button in self.buttons:
             button.draw()
     def update(self,click:bool):
+        ran = False
         for i in range(len(self.buttons)):
-            self.buttons[i].update(click)
+            if self.buttons[i].update(click): ran = True
             self.buttons[i].update_font(self.font_size,"calibri")
             pos = self.rect.topleft
             
@@ -143,6 +153,7 @@ class ButtonGrid:
                 elif prev_rect != None:
                     pos = (prev_rect.right, prev_rect.top)
             self.buttons[i].rect.update(pos[0],pos[1],size[0],size[1])
+        return ran
             
                 
                 
@@ -177,12 +188,12 @@ class Slider:
         
         if self.selected:
             slider_pos = pygame.mouse.get_pos()[0]
-            self.progress = min(max((slider_pos-self.rect.left)/self.rect.width,0),1)
+            self.progress = min(max((slider_pos-self.rect.left-self.rect.width/40)/(self.rect.width-self.rect.width/20),0),1)
 
     def draw(self):
         screen = pygame.display.get_surface()
         
-        slider_pos = self.progress*self.rect.width + self.rect.left
+        slider_pos = self.progress*(self.rect.width * 19/20) + self.rect.left + self.rect.width/40
 
         handle = pygame.rect.Rect(slider_pos-self.rect.width/40,self.rect.top,self.rect.width/20,self.rect.height)
 
@@ -192,49 +203,30 @@ class Slider:
     def get_value(self):
         return self.progress*(self.max-self.min) + self.min
 
-
-# class Slider:
-#     def __init__(self, pos: tuple, size: tuple, initial_val: float, min_val: int, max_val: int) -> None:
-#         self.pos = pos
-#         self.size = size
-
-#         self.slider_left_pos = self.pos[0] - (size[0] // 2)
-#         self.slider_right_pos = self.pos[0] + (size[0] // 2)
-#         self.slider_top_pos = self.pos[1] - (size[1] // 2)
-
-#         self.min = min_val
-#         self.max = max_val
-#         self.initial_val = (self.slider_right_pos - self.slider_left_pos) * initial_val  # percentage
-
-#         self.container_rect = pygame.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
-#         self.button_rect = pygame.Rect(self.slider_left_pos + self.initial_val - 5, self.slider_top_pos, 10, self.size[1])
-
-#         self.dragging = False
-
-#     def move_slider(self, mouse_pos):
-#         new_x = max(self.slider_left_pos, min(mouse_pos[0], self.slider_right_pos))
-#         self.button_rect.centerx = new_x
-
-#     def handle_event(self, event):
-#         if event.type == pygame.MOUSEBUTTONDOWN:
-#             if self.button_rect.collidepoint(event.pos) or self.container_rect.collidepoint(event.pos):
-#                 self.dragging = True
-#                 self.move_slider(event.pos)
-#         elif event.type == pygame.MOUSEBUTTONUP:
-#             self.dragging = False
-#         elif event.type == pygame.MOUSEMOTION and self.dragging:
-#             self.move_slider(event.pos)
-
-#     def draw(self, screen):
-#         pygame.draw.rect(screen, (200, 200, 200), self.container_rect)
-#         pygame.draw.rect(screen, (100, 100, 100), self.button_rect)
+def title_screen(chng_img,BACKGROUND_COLOR):
+    on_title = True
+    title_font = pygame.font.SysFont("free sans",24)
+    text1 = title_font.render('Welcome to Winners Image Data Editor (WIDE), ', True, (0, 0, 0))
+    text1_1 = title_font.render('an image editor built in Python using Pygame and Pillow.', True, (0, 0, 0))
+    text2 = title_font.render('To continue, please upload a file.', True, (0, 0, 0))
+    screen = pygame.display.set_mode((800,600))  # Make window resizable
+    def title_img_set():
+        nonlocal on_title
+        if chng_img(Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")):
+            on_title = False
+    start_up_button = Button((433,348),(80,40),title_img_set,_text="upload",_fontsize=24,_font="free sans")
+    while on_title:
+        clock = pygame.time.Clock()
+        screen.fill(BACKGROUND_COLOR)
+        screen.blit(text1, (screen.get_width()/2-text1.get_width()/2,screen.get_height()/2-text1.get_height()/2))
+        screen.blit(text1_1, (screen.get_width()/2-text1_1.get_width()/2,screen.get_height()/2+text1.get_height()/2))
+        screen.blit(text2, (screen.get_width()/2-text2.get_width()/2,screen.get_height()/2+2*text2.get_height()))
+        start_up_button.draw()
+        for event in pygame.event.get():
+            clicked = False
+            if event.type == pygame.QUIT: quit()
+            if event.type == pygame.MOUSEBUTTONDOWN: clicked = True
+        start_up_button.update(clicked)
+        pygame.display.update()
+        clock.tick(60)
     
-#     def get_value(self):
-#         val_range = self.slider_right_pos - self.slider_left_pos
-#         button_val = self.button_rect.centerx - self.slider_left_pos
-
-#         return (button_val / val_range) * (self.max - self.min) + self.min
-        
-#     def update(self):
-#         self.container_rect = pygame.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
-#         self.button_rect = pygame.Rect(self.slider_left_pos + self.initial_val - 5, self.slider_top_pos, 10, self.size[1])
