@@ -4,11 +4,7 @@ import math
 import sys
 import time
 
-def hue(image_path:str, hue_shift:int):
-    img = Image.open(image_path).convert('RGB')
-    
-    img_array = np.array(img)
-
+def hue(img_array: np.ndarray, hue_shift:int):
     img_hsv = np.zeros_like(img_array, dtype=np.float32)
     for i in range(img_array.shape[0]):
         for j in range(img_array.shape[1]):
@@ -55,9 +51,8 @@ def hue(image_path:str, hue_shift:int):
             img_rgb[i, j] = [(r + m) * 255, (g + m) * 255, (b + m) * 255]
 
     img_rgb = img_rgb.astype(np.uint8)
-    result_img = Image.fromarray(img_rgb, 'RGB')
     
-    return result_img
+    return img_rgb
 
 if __name__ == "__main__":
     from img_io import *

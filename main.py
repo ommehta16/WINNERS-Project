@@ -6,6 +6,7 @@ import math
 import effects.contrast
 import effects.convolute
 import effects.dither
+import effects.hue
 import effects.img_io
 import effects.brightness
 # import effects.hue
@@ -72,11 +73,12 @@ def main():
     def dog():          nonlocal img_arr; img_arr = effects.convolute.EdgeDetect.dog(img_arr,2,1.5,slider.get_value()/30    )
     def contrast():     nonlocal img_arr; img_arr = effects.contrast.contrast       (img_arr,   (slider.get_value()*2))
     def brightness():   nonlocal img_arr; img_arr = effects.brightness.brightness   (img_arr,   slider.get_value()          )
-    def sharpen():      nonlocal img_arr; img_arr = effects.sharpen.sharpen         (img_arr,   slider.get_value()/50,2        )
+    def sharpen():      nonlocal img_arr; img_arr = effects.sharpen.sharpen         (img_arr,   slider.get_value()/50,2     )
     def dither():       nonlocal img_arr; img_arr = effects.dither.dither           (img_arr,True)
     def sepia():        nonlocal img_arr; img_arr = effects.sepia.sepia             (img_arr,   slider.get_value()          )
     def undo():         nonlocal img_arr; img_arr = effects.img_io.img_to_arr(img).astype(int)
     def invert():       nonlocal img_arr; img_arr = effects.invert.invert           (img_arr,   (-(slider.get_value()*2))   )
+    def hue():          nonlocal img_arr; img_arr = effects.hue.hue                 (img_arr,   (slider.get_value()*3.6)          )
 
     title_bar.add_button(_text="open image",_onclick=lambda:change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")))
     title_bar.add_button(_text="save image",_onclick=lambda:save_image(ui_elements.Prompt.get_file_save()))
@@ -91,7 +93,7 @@ def main():
         (invert, "images/icons/effects/invert.png", "Invert"),
         (brightness, "images/icons/effects/brightness.png", "Brightness"),
         (dog, "images/icons/effects/dog.png", "Dog"),
-        (lambda: 0, "images/icons/effects/hue.png", "Hue")
+        (hue, "images/icons/effects/hue.png", "Hue")
     ]
 
     for action, image_path, text in side_bar_buttons:
