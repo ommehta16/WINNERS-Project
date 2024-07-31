@@ -3,6 +3,7 @@ from PIL import Image
 import numpy as np
 import sys
 import math
+import effects.contrast
 import effects.convolute
 import effects.dither
 import effects.img_io
@@ -57,7 +58,7 @@ def main():
     # Create the sidebar buttons
     def blur():         nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(slider.get_value()/2)+0.01 )
     def dog():          nonlocal img_arr; img_arr = effects.convolute.EdgeDetect.dog(img_arr,2,1.5,2.5                      )
-    def contrast():     nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(slider.get_value()/2)+0.01 )
+    def contrast():     nonlocal img_arr; img_arr = effects.contrast.contrast       (img_arr,   (slider.get_value()*2))
     def brightness():   nonlocal img_arr; img_arr = effects.brightness.brightness   (img_arr,   slider.get_value()          )
     def sharpen():      nonlocal img_arr; img_arr = effects.sharpen.sharpen         (img_arr,   slider.get_value()/50,2        )
     def dither():       nonlocal img_arr; img_arr = effects.dither.dither           (img_arr,True)
