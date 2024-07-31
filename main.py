@@ -76,7 +76,7 @@ def main():
     def invert():       nonlocal img_arr; img_arr = effects.invert.invert           (img_arr,   (-(slider.get_value()*2))   )
     def hue():          nonlocal img_arr; img_arr = effects.hue.hue                 (img_arr,   (slider.get_value()*3.6)          )
 
-    title_bar.add_button(_text="open image",_onclick=lambda:change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")))
+    title_bar.add_button(_text="open image",_onclick=lambda:change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG *.HEIC)")))
     title_bar.add_button(_text="save image",_onclick=lambda:save_image(ui_elements.Prompt.get_file_save()))
     
 
