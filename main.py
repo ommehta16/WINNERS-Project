@@ -14,13 +14,7 @@ import effects.sharpen
 # import effects.soften
 from ui import ui_elements
 
-def dist(a, b):
-    return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
-
 BACKGROUND_COLOR = (245, 255, 250)  # Use RGB tuple instead of hex color
-
-def numpy_to_pygame(np_img: np.ndarray) -> pygame.Surface:
-    return effects.img_io.pil_to_pyg(effects.img_io.arr_to_img(np_img))
 
 def main():
     # Set up pygame
@@ -36,10 +30,11 @@ def main():
     img_arr = effects.img_io.img_to_arr(img).astype(int)
 
     title_bar = ui_elements.ButtonGrid([0, 0], [screen.get_size()[0], 20], [0, 1])
-    side_bar = ui_elements.ButtonGrid([0, 20], [screen.get_size()[0] * 1/4, screen.get_size()[1] - 20], [2, 5], hov_col=(0, 114, 182), col=(0, 174, 239))
+    side_bar = ui_elements.ButtonGrid([0, 20], [screen.get_size()[0] * 1/4, screen.get_size()[1] - 20], [2, 3], hov_col=(0, 114, 182), col=(0, 174, 239))
+    # Update the slider position to be within the sidebar
+    slider = ui_elements.Slider((side_bar.rect.width // 2, side_bar.rect.bottom - 50), (side_bar.rect.width - 40, 20), 0, 0, 100)
     def change_image(filepath:str):
         nonlocal img_arr, img, view_img
-        print(filepath)
         if filepath:
             img=effects.img_io.open_img(filepath)
             view_img = effects.img_io.pil_to_pyg(img)
@@ -53,30 +48,27 @@ def main():
             img = effects.img_io.arr_to_img(img_arr)
             img.save(filepath)
 
-
-    title_bar.add_button(_text="open image",_onclick=lambda:change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")))
-    title_bar.add_button(_text="save image",_onclick=lambda:save_image(ui_elements.Prompt.get_file_save()))
-    title_bar.add_button(_text="REPRODUCE", _onclick=lambda: title_bar.add_button(_onclick=lambda: print(ui_elements.Prompt.get_file_open()), _text="open file..."))
-
-    # Update the slider position to be within the sidebar
-    slider = ui_elements.Slider((side_bar.rect.width // 2, side_bar.rect.bottom - 50), (side_bar.rect.width - 40, 20), 0, 0, 100)
-
     def update_preview_area():
         nonlocal preview_rect, screen, side_bar, title_bar, img
         img_rat = img.size[1]/img.size[0]
         img_max = (screen.get_size()[0] - side_bar.rect.right,screen.get_size()[1] -title_bar.rect.bottom)
         preview_rect = pygame.Rect(side_bar.rect.right, title_bar.rect.bottom,min(img_max[0],img_max[1]/img_rat),min(img_max[1],img_max[0]*img_rat))
         preview_rect.center = (side_bar.rect.right + (screen.get_width()-side_bar.rect.right)/2, title_bar.rect.bottom + (screen.get_height()-title_bar.rect.bottom)/2)
+
     # Create the sidebar buttons
     def blur():         nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(slider.get_value()/2)+0.01 )
     def dog():          nonlocal img_arr; img_arr = effects.convolute.EdgeDetect.dog(img_arr,2,1.5,2.5                      )
     def contrast():     nonlocal img_arr; img_arr = effects.contrast.contrast       (img_arr,   (slider.get_value()*2))
     def brightness():   nonlocal img_arr; img_arr = effects.brightness.brightness   (img_arr,   slider.get_value()          )
-    def sharpen():      nonlocal img_arr; img_arr = effects.sharpen.sharpen         (img_arr,   slider.get_value(),1        )
+    def sharpen():      nonlocal img_arr; img_arr = effects.sharpen.sharpen         (img_arr,   slider.get_value()/50,2        )
     def dither():       nonlocal img_arr; img_arr = effects.dither.dither           (img_arr,True)
     def sepia():        nonlocal img_arr; img_arr = effects.sepia.sepia             (img_arr,   slider.get_value()          )
     def undo():         nonlocal img_arr; img_arr = effects.img_io.img_to_arr(img).astype(int)
-    # def soften(): nonlocal img_arr; img_arr = effects.soften.soften(img_arr,slider.get_value())
+    def soften():       nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(slider.get_value()/2)+0.01 )
+
+    title_bar.add_button(_text="open image",_onclick=lambda:change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")))
+    title_bar.add_button(_text="save image",_onclick=lambda:save_image(ui_elements.Prompt.get_file_save()))
+
     side_bar_buttons = [
         (undo,"images/icons/effects/undo.png", "Reset"),
         (blur, "images/icons/effects/blur.png", "Blur"),
@@ -84,21 +76,20 @@ def main():
         (dither, "images/icons/effects/dither.png", "Dither"),
         (sharpen, "images/icons/effects/sharpen.png", "Sharpen"),
         (sepia, "images/icons/effects/sepia.png", "Sepia"),
-        (lambda: 0, "images/icons/effects/soften.png", "Soften"),
+        (soften, "images/icons/effects/soften.png", "Soften"),
         (brightness, "images/icons/effects/brightness.png", "Brightness"),
         (dog, "images/icons/effects/dog.png", "Dog"),
         (lambda: 0, "images/icons/effects/hue.png", "Hue")
     ]
 
-
-    preview_rect = pygame.Rect(1,1,1,1)
-
     for action, image_path, text in side_bar_buttons:
         side_bar.add_button(_onclick=action, _text=text, _font_size=20)
         side_bar.buttons[-1].set_image(image_path)
+    
+    preview_rect = pygame.Rect(1,1,1,1)
     update_preview_area()
+    
     on_title = True
-
     title_font = pygame.font.SysFont("free sans",24)
     text1 = title_font.render('Welcome to Winners Image Data Editor (WIDE), ', True, (0, 0, 0))
     text1_1 = title_font.render('an image editor built in Python using Pygame and Pillow.', True, (0, 0, 0))
@@ -124,13 +115,8 @@ def main():
         start_up_button.draw()
         for event in pygame.event.get():
             clicked = False
-            if event.type == pygame.QUIT:
-                running = False
-                on_title = False
-            if event.type == pygame.MOUSEBUTTONUP:
-                on_title = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                clicked = True
+            if event.type == pygame.QUIT: quit()
+            if event.type == pygame.MOUSEBUTTONDOWN: clicked = True
         start_up_button.update(clicked)
         pygame.display.update()
         clock.tick(10)
