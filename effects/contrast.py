@@ -1,13 +1,13 @@
 from PIL import Image
 import numpy as np
-import img_io
+from effects import img_io
 
 def contrast(img: np.array, change: float) -> np.array:
     for y in range(img.shape[0]):
         for x in range(img.shape[1]):
             img[y,x] = ((change/100)*img[y,x]) + (1-(change/100))*127 #decreasing contrast
                                            
-    return np.clip(img,0,255).astype(int)
+    return np.clip(img,0,255).astype(np.uint8)
 
 if __name__ == "__main__":
     img = np.array(Image.open("/Users/armaanthadani/Desktop/Work/Tufts/Final_Project/WINNERS-Project/effects/chicken.webp"))
