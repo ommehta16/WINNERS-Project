@@ -60,7 +60,8 @@ def main():
             return True
         return False
     def save_image(filepath:str):
-        nonlocal img_arr
+        nonlocal img_arr, clicked
+        clicked = False
         if filepath: effects.img_io.arr_to_img(img_arr).save(filepath)
 
     def update_preview_area():
