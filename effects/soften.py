@@ -1,15 +1,12 @@
-from PIL import Image
+from PIL import Image, ImageFilter
 import numpy as np
-import math
-import sys
 
-def soften(img: Image, value:int):
-    img = np.array(img).astype(int)
-    for y in range(img.shape[0]):
-        for x in range(img.shape[1]):
-            L = 0.11 / value  * img[y,x][0] + 0.3 / value img[y,x][1] + 0.59 / valueimg[y,x][2]
-            img[y, x] = (valueimg[y, x]) + (1-value)L
-
-    img = np.clip(img, 0, 255)
-    Image.fromarray(img.astype(np.uint8)).save('output.png')
-    return img
+def soften(image_path, blur_radius=5, lighten_factor=1.75):
+    # test case: effects.soften.soften("test/output.png").save('output.png')
+    img = Image.open(image_path)
+    blurred_img = img.filter(ImageFilter.GaussianBlur(blur_radius))
+    img_array = np.array(blurred_img)
+    img_array = np.clip(img_array * lighten_factor, 0, 255).astype(np.uint8)
+    lightened_img = Image.fromarray(img_array)
+    return lightened_img
+    
