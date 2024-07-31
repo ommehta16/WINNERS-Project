@@ -28,7 +28,7 @@ def main():
     img_arr = effects.img_io.img_to_arr(img).astype(int)
 
     title_bar = ui_elements.ButtonGrid([0, 0], [screen.get_size()[0], 20], [0, 1])
-    side_bar = ui_elements.ButtonGrid([0, 20], [screen.get_size()[0] * 1/4, screen.get_size()[1] - 20], [2, 3], hov_col=(0, 114, 182), col=(0, 174, 239))
+    side_bar = ui_elements.ButtonGrid([0, 20], [screen.get_size()[0] * 1/4, screen.get_size()[1] - 20], [2, 8], hov_col=(0, 114, 182), col=(0, 174, 239))
     # Update the slider position to be within the sidebar
     slider = ui_elements.Slider((side_bar.rect.width // 2, side_bar.rect.bottom - 150), (side_bar.rect.width - 40, 20), 0, 0, 100)
     def change_image(filepath:str):
@@ -78,6 +78,7 @@ def main():
 
     title_bar.add_button(_text="open image",_onclick=lambda:change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")))
     title_bar.add_button(_text="save image",_onclick=lambda:save_image(ui_elements.Prompt.get_file_save()))
+    
 
     side_bar_buttons = [
         (undo,"images/icons/effects/undo.png", "Reset"),
@@ -96,6 +97,12 @@ def main():
         side_bar.add_button(_onclick=action, _text=text, _font_size=20)
         side_bar.buttons[-1].set_image(image_path)
     
+    adjust = ui_elements.ButtonGrid([0, side_bar.buttons[-1].rect.bottom], [screen.get_size()[0] * 1/4, 20], [3, 1])
+    adjust.add_button(_text="CANCEL",_onclick=lambda:change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")))
+    adjust.add_button(_text="PREVIEW",_onclick=lambda:save_image(ui_elements.Prompt.get_file_save()))
+    adjust.add_button(_text="APPLY",_onclick=lambda:save_image(ui_elements.Prompt.get_file_save()))
+    adjust_bg = pygame.rect.Rect([0, side_bar.buttons[-1].rect.bottom],[screen.get_size()[0] * 1/4, screen.get_size()[1]-side_bar.buttons[-1].rect.bottom])
+
     preview_rect = pygame.Rect(1,1,1,1)
     update_preview_area()
     
@@ -132,6 +139,7 @@ def main():
         clock.tick(10)
     screen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)  # Make window resizable
     # Main loop
+    clicked = False
     while running:
         frame += 1
         skip_frame = False
@@ -140,36 +148,53 @@ def main():
         slider_value_text = slider_font.render(f'{int(slider.get_value())}',1,slider_text_color)
         
         # Check on events
-        clicked = False
+        moved = False
+        resized = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 clicked = True
+            if event.type == pygame.MOUSEBUTTONUP:
+                clicked = False
             if event.type == pygame.VIDEORESIZE:  # Handle window resizing
                 screen = pygame.display.set_mode((max(event.w,600), max(event.h,400)), pygame.RESIZABLE)
                 screen.fill(BACKGROUND_COLOR)
                 pygame.display.update()
-                
+                resized = True
                 side_bar.rect.update(side_bar.rect.left,side_bar.rect.top,screen.get_size()[0] * 1/4, screen.get_size()[1] - title_bar.rect.bottom)
                 update_preview_area()
                 skip_frame = True
-            slider.handle_event(event)
+            if event.type == pygame.MOUSEMOTION:
+                moved = True
+
         if skip_frame: continue
 
         view_img = pygame.transform.scale(effects.img_io.pil_to_pyg(effects.img_io.arr_to_img(img_arr)),preview_rect.size)
         
+        if frame % 2 == 0 or resized:
+            adjust.rect.update(adjust.rect.left,screen.get_size()[1]-max((screen.get_size()[1] - side_bar.buttons[-1].rect.bottom)/4,20),screen.get_size()[0] * 1/4, max((screen.get_size()[1] - side_bar.buttons[-1].rect.bottom)/4,20))
+            adjust_bg.update([0, side_bar.buttons[-1].rect.bottom],[screen.get_size()[0] * 1/4, screen.get_size()[1]-side_bar.buttons[-1].rect.bottom])
+            slider.rect.center = (adjust_bg.centerx,adjust_bg.centery+adjust_bg.height/8)
+            slider.rect.size = (adjust_bg.width-40,20)
+
         # UPDATE BUTTONS
-        title_bar.update(clicked)
-        side_bar.update(clicked)
+        slider.update(clicked,moved)
+        if slider.selected: clicked_a = False
+        else: clicked_a = clicked
+        title_bar.update(clicked_a)
+        side_bar.update(clicked_a)
+        adjust.update(clicked_a)
 
         # DRAW EVERYTHING
         screen.fill(BACKGROUND_COLOR)
         title_bar.draw()
         side_bar.draw()
-        slider.draw(screen)
         screen.blit(view_img,preview_rect.topleft)
-        screen.blit(slider_value_text, (10,900))
+        pygame.draw.rect(screen,"dark gray", adjust_bg)
+        adjust.draw()
+        slider.draw()
+        screen.blit(slider_value_text, (slider.rect.left,slider.rect.top - slider_value_text.get_height()))
         clock.tick(30)
         pygame.display.update()
 
