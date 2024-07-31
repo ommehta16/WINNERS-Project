@@ -31,18 +31,35 @@ def main():
     running = True
     frame = 0
 
+    img = effects.img_io.open_img("test/chicken.webp")
+    img_arr = effects.img_io.img_to_arr(img).astype(int)
+
     title_bar = ui_elements.ButtonGrid([0, 0], [screen.get_size()[0], 20], [0, 1])
     side_bar = ui_elements.ButtonGrid([0, 20], [screen.get_size()[0] * 1/4, screen.get_size()[1] - 20], [2, 5], hov_col=(0, 114, 182), col=(0, 174, 239))
+    def change_image(filepath:str):
+        nonlocal img_arr, img, view_img
+        print(filepath)
+        if filepath:
+            img=effects.img_io.open_img(filepath)
+            view_img = effects.img_io.pil_to_pyg(img)
+            img_arr = effects.img_io.img_to_arr(img).astype(int)
+            update_preview_area()
+    def save_image(filepath:str):
+        nonlocal img_arr
+        if filepath:
+            img = effects.img_io.arr_to_img(img_arr)
+            img.save(filepath)
+
+
+    title_bar.add_button(_text="open image",_onclick=lambda:change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")))
+    title_bar.add_button(_text="save image",_onclick=lambda:save_image(ui_elements.Prompt.get_file_save()))
     title_bar.add_button(_text="REPRODUCE", _onclick=lambda: title_bar.add_button(_onclick=lambda: print(ui_elements.Prompt.get_file_open()), _text="open file..."))
 
     # Update the slider position to be within the sidebar
     slider = ui_elements.Slider((side_bar.rect.width // 2, side_bar.rect.bottom - 50), (side_bar.rect.width - 40, 20), 0, 0, 100)
-    
-    img = effects.img_io.open_img("test/time-transfixed.jpg")
-    img_arr = effects.img_io.img_to_arr(img).astype(int)
 
     def update_preview_area():
-        nonlocal preview_rect, screen, side_bar, title_bar
+        nonlocal preview_rect, screen, side_bar, title_bar, img
         img_rat = img.size[1]/img.size[0]
         img_max = (screen.get_size()[0] - side_bar.rect.right,screen.get_size()[1] -title_bar.rect.bottom)
         preview_rect = pygame.Rect(side_bar.rect.right, title_bar.rect.bottom,min(img_max[0],img_max[1]/img_rat),min(img_max[1],img_max[0]*img_rat))
@@ -53,7 +70,7 @@ def main():
     def contrast():     nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(slider.get_value()/2)+0.01 )
     def brightness():   nonlocal img_arr; img_arr = effects.brightness.brightness   (img_arr,   slider.get_value()          )
     def sharpen():      nonlocal img_arr; img_arr = effects.sharpen.sharpen         (img_arr,   slider.get_value(),1        )
-    def dither():       nonlocal img_arr; img_arr = effects.dither.dither_linear    (img_arr,False)
+    def dither():       nonlocal img_arr; img_arr = effects.dither.dither           (img_arr,True)
     def sepia():        nonlocal img_arr; img_arr = effects.sepia.sepia             (img_arr,   slider.get_value()          )
     def undo():         nonlocal img_arr; img_arr = effects.img_io.img_to_arr(img).astype(int)
     # def soften(): nonlocal img_arr; img_arr = effects.soften.soften(img_arr,slider.get_value())
