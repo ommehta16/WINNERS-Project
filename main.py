@@ -9,6 +9,7 @@ import effects.dither
 import effects.img_io
 import effects.brightness
 # import effects.hue
+import effects.invert
 import effects.sepia
 import effects.sharpen
 # import effects.soften
@@ -64,7 +65,7 @@ def main():
     def dither():       nonlocal img_arr; img_arr = effects.dither.dither           (img_arr,True)
     def sepia():        nonlocal img_arr; img_arr = effects.sepia.sepia             (img_arr,   slider.get_value()          )
     def undo():         nonlocal img_arr; img_arr = effects.img_io.img_to_arr(img).astype(int)
-    def soften():       nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(slider.get_value()/2)+0.01 )
+    def invert():       nonlocal img_arr; img_arr = effects.invert.invert           (img_arr,   (-(slider.get_value()*2))   )
 
     title_bar.add_button(_text="open image",_onclick=lambda:change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")))
     title_bar.add_button(_text="save image",_onclick=lambda:save_image(ui_elements.Prompt.get_file_save()))
@@ -76,7 +77,7 @@ def main():
         (dither, "images/icons/effects/dither.png", "Dither"),
         (sharpen, "images/icons/effects/sharpen.png", "Sharpen"),
         (sepia, "images/icons/effects/sepia.png", "Sepia"),
-        (soften, "images/icons/effects/soften.png", "Soften"),
+        (inv, "images/icons/effects/invert.png", "Invert"),
         (brightness, "images/icons/effects/brightness.png", "Brightness"),
         (dog, "images/icons/effects/dog.png", "Dog"),
         (lambda: 0, "images/icons/effects/hue.png", "Hue")
