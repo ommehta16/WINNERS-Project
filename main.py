@@ -88,7 +88,7 @@ def main():
         (dither, "images/icons/effects/dither.png", "Dither"),
         (sharpen, "images/icons/effects/sharpen.png", "Sharpen"),
         (sepia, "images/icons/effects/sepia.png", "Sepia"),
-        (inv, "images/icons/effects/invert.png", "Invert"),
+        (invert, "images/icons/effects/invert.png", "Invert"),
         (brightness, "images/icons/effects/brightness.png", "Brightness"),
         (dog, "images/icons/effects/dog.png", "Dog"),
         (lambda: 0, "images/icons/effects/hue.png", "Hue")
