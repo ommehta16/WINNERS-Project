@@ -1,19 +1,15 @@
 import pygame
 from PIL import Image
 import numpy as np
-import sys
-import math
 import effects.contrast
 import effects.convolute
 import effects.dither
 import effects.hue
 import effects.img_io
 import effects.brightness
-# import effects.hue
 import effects.invert
 import effects.sepia
 import effects.sharpen
-# import effects.soften
 from ui import ui_elements
 
 BACKGROUND_COLOR = (245, 255, 250)  # Use RGB tuple instead of hex color
@@ -23,7 +19,7 @@ def main():
     pygame.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
-    pygame.display.set_caption('the thing')
+    pygame.display.set_caption('WIDE')
 
     running = True
     frame = 0
@@ -34,7 +30,7 @@ def main():
     title_bar = ui_elements.ButtonGrid([0, 0], [screen.get_size()[0], 20], [0, 1])
     side_bar = ui_elements.ButtonGrid([0, 20], [screen.get_size()[0] * 1/4, screen.get_size()[1] - 20], [2, 3], hov_col=(0, 114, 182), col=(0, 174, 239))
     # Update the slider position to be within the sidebar
-    slider = ui_elements.Slider((side_bar.rect.width // 2, side_bar.rect.bottom - 50), (side_bar.rect.width - 40, 20), 0, 0, 100)
+    slider = ui_elements.Slider((side_bar.rect.width // 2, side_bar.rect.bottom - 150), (side_bar.rect.width - 40, 20), 0, 0, 100)
     def change_image(filepath:str):
         nonlocal img_arr, img, view_img
         if filepath:
@@ -92,7 +88,7 @@ def main():
         (sepia, "images/icons/effects/sepia.png", "Sepia"),
         (invert, "images/icons/effects/invert.png", "Invert"),
         (brightness, "images/icons/effects/brightness.png", "Brightness"),
-        (dog, "images/icons/effects/dog.png", "Dog"),
+        (dog, "images/icons/effects/dog.png", "Drawing"),
         (hue, "images/icons/effects/hue.png", "Hue")
     ]
 
