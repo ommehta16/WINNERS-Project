@@ -105,6 +105,11 @@ def main():
     text1 = title_font.render('Welcome to Winners Image Data Editor (WIDE), ', True, (0, 0, 0))
     text1_1 = title_font.render('an image editor built in Python using Pygame and Pillow.', True, (0, 0, 0))
     text2 = title_font.render('To continue, please upload a file.', True, (0, 0, 0))
+
+    #getting slider value in text
+    slider_font = pygame.font.SysFont("free sans",30)
+    slider_text_color = (0,0,0)
+    
     def title_img_set():
         nonlocal on_title
         if change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")):
@@ -132,6 +137,9 @@ def main():
         frame += 1
         skip_frame = False
 
+        #displaying slider value
+        slider_value_text = slider_font.render(f'{int(slider.get_value())}',1,slider_text_color)
+        
         # Check on events
         clicked = False
         for event in pygame.event.get():
@@ -162,6 +170,7 @@ def main():
         side_bar.draw()
         slider.draw(screen)
         screen.blit(view_img,preview_rect.topleft)
+        screen.blit(slider_value_text, (10,900))
         clock.tick(30)
         pygame.display.update()
 
