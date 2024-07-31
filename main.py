@@ -21,7 +21,7 @@ def main():
     # Set up pygame
     pygame.init()
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode((1920, 1080), pygame.RESIZABLE)
+    screen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
     pygame.display.set_caption('the thing')
 
     running = True
@@ -56,9 +56,20 @@ def main():
         preview_rect = pygame.Rect(side_bar.rect.right, title_bar.rect.bottom,min(img_max[0],img_max[1]/img_rat),min(img_max[1],img_max[0]*img_rat))
         preview_rect.center = (side_bar.rect.right + (screen.get_width()-side_bar.rect.right)/2, title_bar.rect.bottom + (screen.get_height()-title_bar.rect.bottom)/2)
 
+    def apply_effect(effect):
+        pass
+
+    # Show slider
+    # Show text above slider = "Apply" + effect name
+    # Show label(s) for slider(s): intensity, power, min, max, etc.
+    # Show buttons to APPLY | PREVIEW | CANCEL
+    # CANCEL --> stop and do nothing
+    # PREVIEW --> generate effect, show preview on image BUT don't change img_arr
+    # APPLY --> generate effect, change img_arr. If a preview has been generated with the current params, use said preview
+ 
     # Create the sidebar buttons
     def blur():         nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(slider.get_value()/2)+0.01 )
-    def dog():          nonlocal img_arr; img_arr = effects.convolute.EdgeDetect.dog(img_arr,2,1.5,2.5                      )
+    def dog():          nonlocal img_arr; img_arr = effects.convolute.EdgeDetect.dog(img_arr,2,1.5,slider.get_value()/30    )
     def contrast():     nonlocal img_arr; img_arr = effects.contrast.contrast       (img_arr,   (slider.get_value()*2))
     def brightness():   nonlocal img_arr; img_arr = effects.brightness.brightness   (img_arr,   slider.get_value()          )
     def sharpen():      nonlocal img_arr; img_arr = effects.sharpen.sharpen         (img_arr,   slider.get_value()/50,2        )
