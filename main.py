@@ -77,7 +77,7 @@ def main():
     def undo():         nonlocal img_arr; img_arr = effects.img_io.img_to_arr(img).astype(int)
     # def soften(): nonlocal img_arr; img_arr = effects.soften.soften(img_arr,slider.get_value())
     side_bar_buttons = [
-        (undo,"images/icons/effects/undo.png", "Undo"),
+        (undo,"images/icons/effects/undo.png", "Reset"),
         (blur, "images/icons/effects/blur.png", "Blur"),
         (contrast, "images/icons/effects/contrast.png", "Contrast"),
         (dither, "images/icons/effects/dither.png", "Dither"),
