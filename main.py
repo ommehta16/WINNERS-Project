@@ -184,20 +184,21 @@ def main():
 
         # UPDATE BUTTONS
         slider.update(clicked,moved)
-        if slider.selected: clicked = False
-        title_bar.update(clicked)
-        side_bar.update(clicked)
-        adjust.update(clicked)
+        if slider.selected: clicked_a = False
+        else: clicked_a = clicked
+        title_bar.update(clicked_a)
+        side_bar.update(clicked_a)
+        adjust.update(clicked_a)
 
         # DRAW EVERYTHING
         screen.fill(BACKGROUND_COLOR)
         title_bar.draw()
         side_bar.draw()
         screen.blit(view_img,preview_rect.topleft)
-        screen.blit(slider_value_text, (10,900))
         pygame.draw.rect(screen,"dark gray", adjust_bg)
         adjust.draw()
         slider.draw()
+        screen.blit(slider_value_text, (slider.rect.left,slider.rect.top - slider_value_text.get_height()))
         clock.tick(30)
         pygame.display.update()
 
