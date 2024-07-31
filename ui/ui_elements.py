@@ -137,7 +137,7 @@ class ButtonGrid:
                 size = (max(self.buttons[i].rendered_text.get_size()[0] + 10, 25), self.rect.height)
                 if prev_rect != None: pos = (prev_rect.right, prev_rect.top)
             else:
-                size = (self.rect.width / self.grid_size[0], self.rect.width / self.grid_size[1])
+                size = (self.rect.width / self.grid_size[0], self.rect.height / self.grid_size[1])
                 if i > 0 and i % self.grid_size[0] == 0:
                     pos = (pos[0], prev_rect.top + size[1])
                 elif prev_rect != None:
@@ -160,50 +160,35 @@ class Prompt:
         return file_name
     
 class Slider:
-    def __init__(self, pos: tuple, size: tuple, initial_val: float, min_val: int, max_val: int) -> None:
-        self.pos = pos
-        self.size = size
+    def __init__(self, center: tuple, size: tuple, initial_val: float, min_val: int, max_val: int) -> None:
+        self.progress:float = float(initial_val)
+        self.min:float = min_val
+        self.max:float = max_val
+        self.rect:pygame.rect.Rect = pygame.rect.Rect(center[0]-size[0]/2,center[1]-size[1]/2,size[0],size[1])
+        self.selected:bool = False
 
-        self.slider_left_pos = self.pos[0] - (size[0] // 2)
-        self.slider_right_pos = self.pos[0] + (size[0] // 2)
-        self.slider_top_pos = self.pos[1] - (size[1] // 2)
+    def update(self,clicked:bool,moved:bool):
+        if clicked:
+            if self.rect.collidepoint(pygame.mouse.get_pos()):
+                self.selected = True
+        elif moved and self.selected:
+            self.selected = True
+        else:
+            self.selected = False
+        
+        if self.selected:
+            slider_pos = pygame.mouse.get_pos()[0]
+            self.progress = min(max((slider_pos-self.rect.left)/self.rect.width,0),1)
 
-        self.min = min_val
-        self.max = max_val
-        self.initial_val = (self.slider_right_pos - self.slider_left_pos) * initial_val  # percentage
+    def draw(self):
+        screen = pygame.display.get_surface()
+        
+        slider_pos = self.progress*self.rect.width + self.rect.left
 
-        self.container_rect = pygame.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
-        self.button_rect = pygame.Rect(self.slider_left_pos + self.initial_val - 5, self.slider_top_pos, 10, self.size[1])
+        handle = pygame.rect.Rect(slider_pos-self.rect.width/40,self.rect.top,self.rect.width/20,self.rect.height)
 
-        self.dragging = False
+        pygame.draw.rect(screen,(200,200,200),self.rect)
+        pygame.draw.rect(screen,(100,100,100),handle)
 
-    def move_slider(self, mouse_pos):
-        new_x = max(self.slider_left_pos, min(mouse_pos[0], self.slider_right_pos))
-        self.button_rect.centerx = new_x
-
-    def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.button_rect.collidepoint(event.pos) or self.container_rect.collidepoint(event.pos):
-                self.dragging = True
-                self.move_slider(event.pos)
-        elif event.type == pygame.MOUSEBUTTONUP:
-            self.dragging = False
-        elif event.type == pygame.MOUSEMOTION and self.dragging:
-            self.move_slider(event.pos)
-
-    def draw(self, screen):
-        pygame.draw.rect(screen, (200, 200, 200), self.container_rect)
-        pygame.draw.rect(screen, (100, 100, 100), self.button_rect)
-    
     def get_value(self):
-        val_range = self.slider_right_pos - self.slider_left_pos
-        button_val = self.button_rect.centerx - self.slider_left_pos
-
-        return (button_val / val_range) * (self.max - self.min) + self.min
-        
-        
-
-
-
-
-        
+        return self.progress*(self.max-self.min) + self.min
