@@ -45,6 +45,8 @@ def main():
             view_img = effects.img_io.pil_to_pyg(img)
             img_arr = effects.img_io.img_to_arr(img).astype(int)
             update_preview_area()
+            return True
+        return False
     def save_image(filepath:str):
         nonlocal img_arr
         if filepath:
@@ -98,23 +100,33 @@ def main():
     on_title = True
 
     title_font = pygame.font.SysFont("free sans",24)
-    text1 = title_font.render('Welcome to Winners Image Data Editor (WIDE), an image editor built in Python using Pygame and Pillow.', True, (0, 0, 0))
+    text1 = title_font.render('Welcome to Winners Image Data Editor (WIDE), ', True, (0, 0, 0))
+    text1_1 = title_font.render('an image editor built in Python using Pygame and Pillow.', True, (0, 0, 0))
     text2 = title_font.render('To continue, please upload a file.', True, (0, 0, 0))
+    def title_img_set():
+        nonlocal on_title
+        if change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")):
+            on_title = False
+
     
-    uploadButton = pygame.Surface((300, 50)) 
-    uploadButton.fill((0, 174, 239))
     screen = pygame.display.set_mode((800,600))  # Make window resizable
+    start_up_button = ui_elements.Button((433,348),(80,40),title_img_set,_text="upload",_fontsize=24,_font="free sans")
     while on_title:
         screen.fill(BACKGROUND_COLOR)
-        screen.blit(text1, (screen.get_width()/2-text1.get_width()/2,screen.get_height()/2+text1.get_height()/2))
-        screen.blit(text2, (screen.get_width()/2-text2.get_width()/2,screen.get_height()/2-text2.get_height()/2))
-        screen.blit(uploadButton, (screen.get_width()/2-text2.get_width()/2,screen.get_height()/2-text2.get_height()/2-uploadButton.get_height()/2-100))
+        screen.blit(text1, (screen.get_width()/2-text1.get_width()/2,screen.get_height()/2-text1.get_height()/2))
+        screen.blit(text1_1, (screen.get_width()/2-text1_1.get_width()/2,screen.get_height()/2+text1.get_height()/2))
+        screen.blit(text2, (screen.get_width()/2-text2.get_width()/2,screen.get_height()/2+2*text2.get_height()))
+        start_up_button.draw()
         for event in pygame.event.get():
+            clicked = False
             if event.type == pygame.QUIT:
                 running = False
                 on_title = False
             if event.type == pygame.MOUSEBUTTONUP:
                 on_title = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                clicked = True
+        start_up_button.update(clicked)
         pygame.display.update()
         clock.tick(10)
     screen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)  # Make window resizable

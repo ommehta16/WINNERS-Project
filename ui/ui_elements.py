@@ -31,7 +31,7 @@ class Button:
         if self.image != None:
             if self.image.get_size()[0] > 20 and self.image.get_size()[1] > 20: screen.blit(self.image,(self.rect.centerx-self.image.get_size()[0]/2,self.rect.top))
             if self.rendered_text != None: screen.blit(self.rendered_text,(self.rect.centerx-self.rendered_text.get_size()[0]/2,self.rect.top+self.image.get_size()[1]))
-        elif self.rendered_text != None: screen.blit(self.rendered_text,(self.rect.centerx-self.rendered_text.get_size()[0]/2,self.rect.top))
+        elif self.rendered_text != None: screen.blit(self.rendered_text,(self.rect.centerx-self.rendered_text.get_size()[0]/2,max(self.rect.centery-self.rendered_text.get_height()/2,self.rect.top)))
         
     def update(self, click:bool):
         mouse_pos = pygame.mouse.get_pos()
