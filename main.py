@@ -28,6 +28,15 @@ def main():
 
     img = effects.img_io.open_img("test/chicken.webp")
     img_arr = effects.img_io.img_to_arr(img).astype(int)
+
+    #loading text function
+
+    loading_font = pygame.font.SysFont("free sans",30)
+    loading_text_color = (0,0,0)
+
+    def loadingtext(func):
+        loading_text = loading_font.render('Processing ...',1,loading_text_color)
+        func()
     # Create the sidebar buttons
     effect_names = ["Reset","Blur","Contrast","Dither","Sharpen","Sepia","Invert","Brightness","Drawing","Hue"]
     def blur():         nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(slider.get_value()/2)+0.01 )
