@@ -110,8 +110,8 @@ def hue_nine(img_arr:np.ndarray,hue_shift:int):
 
 if __name__ == "__main__":
     from img_io import *
-    img_arr = img_to_arr(open_img("test/chicken.webp"))
+    img_arr = img_to_arr(open_img("/Users/armaanthadani/Desktop/Work/Tufts/Final_Project/WINNERS-Project/effects/chicken.webp"))
     
     img_arr = hue_nine(img_arr,56)
 
-    Image.fromarray(img_arr.astype(np.uint8)).save("test/output.png")
+    Image.fromarray(img_arr.astype(np.uint8)).save("out3.png")
