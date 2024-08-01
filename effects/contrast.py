@@ -3,9 +3,11 @@ import numpy as np
 from effects import img_io
 
 def contrast(img: np.array, change: float) -> np.array:
-    for y in range(img.shape[0]):
-        for x in range(img.shape[1]):
-            img[y,x] = ((change/100)*img[y,x]) + (1-(change/100))*127 #decreasing contrast
+    
+    gray = np.zeros(img.shape).astype(int)
+    gray = gray + 127
+    change /= 100
+    img = change*img + (1-change)*gray
                                            
     return np.clip(img,0,255).astype(np.uint8)
 

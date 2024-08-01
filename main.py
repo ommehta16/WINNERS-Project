@@ -27,17 +27,85 @@ def main():
 
     img = effects.img_io.open_img("test/chicken.webp")
     img_arr = effects.img_io.img_to_arr(img).astype(int)
+
+    #loading text function
+
+    loading_font = pygame.font.SysFont("free sans",30)
+    loading_text_color = (0,0,0)
     
-    def blur():         nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(adjust_block.get_slider_val()/2)+0.01 )
-    def dog():          nonlocal img_arr; img_arr = effects.convolute.EdgeDetect.dog(img_arr,2,1.5,adjust_block.get_slider_val()/30    )
-    def contrast():     nonlocal img_arr; img_arr = effects.contrast.contrast       (img_arr,   (adjust_block.get_slider_val()*2)      )
-    def brightness():   nonlocal img_arr; img_arr = effects.brightness.brightness   (img_arr,   adjust_block.get_slider_val()          )
-    def sharpen():      nonlocal img_arr; img_arr = effects.sharpen.sharpen         (img_arr,   adjust_block.get_slider_val()/50,2     )
-    def dither():       nonlocal img_arr; img_arr = effects.dither.dither           (img_arr,True)
-    def sepia():        nonlocal img_arr; img_arr = effects.sepia.sepia             (img_arr,   adjust_block.get_slider_val()          )
-    def undo():         nonlocal img_arr; img_arr = effects.img_io.img_to_arr(img).astype(int)
-    def invert():       nonlocal img_arr; img_arr = effects.invert.invert           (img_arr,   (-(adjust_block.get_slider_val()*2))   )
-    def hue():          nonlocal img_arr; img_arr = effects.hue.hue_nine         (img_arr,   int(adjust_block.get_slider_val()*3.6)    )
+    def get_options():
+        pass
+
+    def loadingtext():
+        loading_text = loading_font.render('Processing...',1,loading_text_color)
+        screen.blit(loading_text,(screen.get_width()/8 - loading_text.get_width()/2,3*screen.get_height()/4-loading_text.get_width()/2))
+        pygame.display.set_caption("W    I    D    E • Processing Image...")
+        pygame.event.pump()
+        pygame.display.update()
+    def reset_text():
+        pygame.display.set_caption('W    I    D    E')
+
+    
+    def blur():
+        get_options()
+        loadingtext()
+        nonlocal img_arr
+        img_arr = effects.convolute.Blur.gaussian (img_arr,16,(adjust_block.get_slider_val()/2)+0.01)
+        reset_text()
+    def dog():
+        get_options()
+        loadingtext()
+        nonlocal img_arr
+        img_arr = effects.convolute.EdgeDetect.dog(img_arr,2,1.5,adjust_block.get_slider_val()/30)
+        reset_text()
+    def contrast():
+        get_options()
+        loadingtext()
+        nonlocal img_arr
+        img_arr = effects.contrast.contrast(img_arr,(adjust_block.get_slider_val()*2))
+        reset_text()
+    def brightness():
+        get_options()
+        loadingtext()
+        nonlocal img_arr
+        img_arr = effects.brightness.brightness(img_arr,adjust_block.get_slider_val())
+        reset_text()
+    def sharpen():
+        get_options()
+        loadingtext()
+        nonlocal img_arr
+        img_arr = effects.sharpen.sharpen(img_arr,adjust_block.get_slider_val()/50,2)
+        reset_text()
+    def dither():
+        get_options()
+        loadingtext()
+        nonlocal img_arr
+        img_arr = effects.dither.dither(img_arr,True)
+        reset_text()
+    def sepia():
+        get_options()
+        loadingtext()
+        nonlocal img_arr
+        img_arr = effects.sepia.sepia(img_arr,adjust_block.get_slider_val())
+        reset_text()
+    def undo():
+        get_options()
+        loadingtext()
+        nonlocal img_arr
+        img_arr = effects.img_io.img_to_arr(img).astype(int)
+        reset_text()
+    def invert():
+        get_options()
+        loadingtext()
+        nonlocal img_arr
+        img_arr = effects.invert.invert(img_arr,(-(adjust_block.get_slider_val()*2)))
+        reset_text()
+    def hue():
+        get_options()
+        loadingtext()
+        nonlocal img_arr
+        img_arr = effects.hue.hue_nine(img_arr,int(adjust_block.get_slider_val()*3.6))
+        reset_text()
 
     clicked = False
     def change_image():
@@ -49,6 +117,8 @@ def main():
             view_img = effects.img_io.pil_to_pyg(img)
             img_arr = effects.img_io.img_to_arr(img).astype(int)
             update_preview_area()
+            return True
+        return False
     
     def save_image():
         nonlocal img_arr, clicked
