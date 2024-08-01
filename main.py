@@ -26,119 +26,145 @@ def main():
     pygame.display.set_caption('W    I    D    E')
 
     img = effects.img_io.open_img("test/chicken.webp")
-    img_arr = effects.img_io.img_to_arr(img).astype(int)
+    edit_img_arr = effects.img_io.img_to_arr(img).astype(int)
+    preview_img_arr = edit_img_arr
 
     #loading text function
 
     loading_font = pygame.font.SysFont("free sans",30)
     loading_text_color = (0,0,0)
     
-    def get_options():
-        pass
+    def get_options(func):
+        nonlocal edit_img_arr, preview_img_arr, preview_rect, rescale, screen, side_bar
+        # IT'S WAR CRIME TIME
+        preview_img_arr = edit_img_arr
+        clicked = False
+        rescale = True
+        callerID = ""
+        tmp_font = pygame.font.SysFont("Calibri",30)
+        for button in side_bar.buttons:
+            if button.is_hovered:
+                callerID = button.text
+                break
+        callerText = tmp_font.render(f"{callerID} Settings",True,(0,0,0))
 
-    def loadingtext():
+        while True:
+            moved = False
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+                if event.type == pygame.MOUSEBUTTONDOWN: clicked = True
+                if event.type == pygame.MOUSEBUTTONUP: clicked = False
+                if event.type == pygame.MOUSEMOTION: moved = True
+                if event.type == pygame.VIDEORESIZE: screen = pygame.display.set_mode(screen.get_size(), pygame.RESIZABLE)
+            adjust_block.update(clicked,moved)
+            adjust_block.draw()
+            if adjust_block.adjust.buttons[0].update(clicked):
+                preview_img_arr = edit_img_arr
+                screen = pygame.display.set_mode(screen.get_size(),pygame.RESIZABLE)
+                return
+            if adjust_block.adjust.buttons[1].update(clicked):
+                preview_img_arr = edit_img_arr
+                loadingtext(func)
+                view_img = pygame.transform.scale(effects.img_io.pil_to_pyg(effects.img_io.arr_to_img(preview_img_arr)),preview_rect.size)
+                screen.blit(view_img,preview_rect.topleft)
+                pygame.display.set_caption("W    I    D    E • Previewing Image")
+            if adjust_block.adjust.buttons[2].update(clicked):
+                loadingtext(func)
+                screen = pygame.display.set_mode(screen.get_size(),pygame.RESIZABLE)
+                return
+            
+            screen.blit(callerText,(screen.get_width()/8 - callerText.get_width()/2,13.5/16*screen.get_height()-callerText.get_width()/2))
+            pygame.display.update()
+            clock.tick(30)
+
+    def loadingtext(func):
+        nonlocal screen, adjust_block
         loading_text = loading_font.render('Processing...',1,loading_text_color)
-        screen.blit(loading_text,(screen.get_width()/8 - loading_text.get_width()/2,3*screen.get_height()/4-loading_text.get_width()/2))
+        screen.blit(loading_text,(screen.get_width()/8,adjust_block.adjust_bg.top))
+        print((screen.get_width()/8,side_bar.rect.bottom))
+        print((screen.get_width(),screen.get_height()))
         pygame.display.set_caption("W    I    D    E • Processing Image...")
         pygame.event.pump()
         pygame.display.update()
-    def reset_text():
+        func()
         pygame.display.set_caption('W    I    D    E')
 
     
-    def blur():
-        get_options()
-        loadingtext()
-        nonlocal img_arr
-        img_arr = effects.convolute.Blur.gaussian (img_arr,16,(adjust_block.get_slider_val()/2)+0.01)
-        reset_text()
+    def blur(a:np.ndarray):
+        nonlocal preview_img_arr
+        preview_img_arr = effects.convolute.Blur.gaussian(preview_img_arr,16,(adjust_block.get_slider_val()/2)+0.01)
+        
     def dog():
-        get_options()
-        loadingtext()
-        nonlocal img_arr
-        img_arr = effects.convolute.EdgeDetect.dog(img_arr,2,1.5,adjust_block.get_slider_val()/30)
-        reset_text()
+        nonlocal preview_img_arr
+        preview_img_arr = effects.convolute.EdgeDetect.dog(preview_img_arr,2,1.5,adjust_block.get_slider_val()/30)
+        
     def contrast():
-        get_options()
-        loadingtext()
-        nonlocal img_arr
-        img_arr = effects.contrast.contrast(img_arr,(adjust_block.get_slider_val()*2))
-        reset_text()
+        nonlocal preview_img_arr
+        preview_img_arr = effects.contrast.contrast(preview_img_arr,(adjust_block.get_slider_val()*2))
+        
     def brightness():
-        get_options()
-        loadingtext()
-        nonlocal img_arr
-        img_arr = effects.brightness.brightness(img_arr,adjust_block.get_slider_val())
-        reset_text()
+        nonlocal preview_img_arr
+        preview_img_arr = effects.brightness.brightness(preview_img_arr,adjust_block.get_slider_val())
+        
     def sharpen():
-        get_options()
-        loadingtext()
-        nonlocal img_arr
-        img_arr = effects.sharpen.sharpen(img_arr,adjust_block.get_slider_val()/50,2)
-        reset_text()
+        nonlocal preview_img_arr
+        preview_img_arr = effects.sharpen.sharpen(preview_img_arr,adjust_block.get_slider_val()/50,2)
+        
     def dither():
-        get_options()
-        loadingtext()
-        nonlocal img_arr
-        img_arr = effects.dither.dither(img_arr,True)
-        reset_text()
+        nonlocal preview_img_arr
+        preview_img_arr = effects.dither.dither(preview_img_arr,True)
+        
     def sepia():
-        get_options()
-        loadingtext()
-        nonlocal img_arr
-        img_arr = effects.sepia.sepia(img_arr,adjust_block.get_slider_val())
-        reset_text()
+        nonlocal preview_img_arr
+        preview_img_arr = effects.sepia.sepia(preview_img_arr,adjust_block.get_slider_val())
+        
     def undo():
-        get_options()
-        loadingtext()
-        nonlocal img_arr
-        img_arr = effects.img_io.img_to_arr(img).astype(int)
-        reset_text()
+        nonlocal preview_img_arr
+        preview_img_arr = effects.img_io.img_to_arr(img).astype(int)
+        
     def invert():
-        get_options()
-        loadingtext()
-        nonlocal img_arr
-        img_arr = effects.invert.invert(img_arr,(-(adjust_block.get_slider_val()*2)))
-        reset_text()
+        nonlocal preview_img_arr
+        preview_img_arr = effects.invert.invert(preview_img_arr,(-(adjust_block.get_slider_val()*2)))
+        
     def hue():
-        get_options()
-        loadingtext()
-        nonlocal img_arr
-        img_arr = effects.hue.hue_nine(img_arr,int(adjust_block.get_slider_val()*3.6))
-        reset_text()
+        nonlocal preview_img_arr
+        preview_img_arr = effects.hue.hue_nine(preview_img_arr,int(adjust_block.get_slider_val()*3.6))
+        
 
     clicked = False
     def change_image():
-        nonlocal img_arr, img, view_img, clicked
+        nonlocal preview_img_arr, img, view_img, clicked
         clicked = False
         filepath = ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")
         if filepath:
             img=effects.img_io.open_img(filepath)
             view_img = effects.img_io.pil_to_pyg(img)
-            img_arr = effects.img_io.img_to_arr(img).astype(int)
+            preview_img_arr = effects.img_io.img_to_arr(img).astype(int)
             update_preview_area()
             return True
         return False
     
     def save_image():
-        nonlocal img_arr, clicked
+        nonlocal preview_img_arr, clicked
         clicked = False
         filepath = ui_elements.Prompt.get_file_save()
-        if filepath: effects.img_io.arr_to_img(img_arr).save(filepath)
+        if filepath: effects.img_io.arr_to_img(preview_img_arr).save(filepath)
 
     def mul_image():
-        nonlocal img_arr, img, clicked
+        nonlocal preview_img_arr, img, clicked
         clicked = False
         tmp_img_arr = effects.img_io.img_to_arr(img).astype(int)
-        if tmp_img_arr.shape == img_arr.shape: img_arr = (img_arr.astype(float)/255 * tmp_img_arr).astype(int)
+        if tmp_img_arr.shape == preview_img_arr.shape: preview_img_arr = (preview_img_arr.astype(float)/255 * tmp_img_arr).astype(int)
     
     def add_image():
-        nonlocal img_arr, img, clicked
+        nonlocal preview_img_arr, img, clicked
         clicked = False
         tmp_img_arr = effects.img_io.img_to_arr(img).astype(int)
-        if tmp_img_arr.shape == img_arr.shape: img_arr = img_arr + tmp_img_arr
+        if tmp_img_arr.shape == preview_img_arr.shape: preview_img_arr = preview_img_arr + tmp_img_arr
 
-    side_bar_buttons = [ ([undo,blur,contrast,dither,sharpen,sepia,invert,brightness,dog,hue][i],
+    wrapped = [undo, lambda: get_options(blur), lambda: get_options(contrast), lambda: get_options(dither), lambda: get_options(sharpen), lambda: get_options(sepia), lambda: get_options(invert), lambda: get_options(brightness), lambda: get_options(dog), lambda: get_options(hue)]
+    side_bar_buttons = [ (wrapped[i],
                           f"images/icons/effects/{EFFECT_NAMES[i].lower()}.png", EFFECT_NAMES[i]) for i in range(len(EFFECT_NAMES))]
     
     title_bar_buttons = [ ([change_image,save_image,mul_image,add_image][i], "", TITLE_NAMES[i]) for i in range(len(TITLE_NAMES))]
@@ -186,7 +212,8 @@ def main():
 
         if rescale or since_resize < 5:
             adjust_block.update_size(screen,side_bar.buttons[-1].rect.bottom)
-            view_img = pygame.transform.scale(effects.img_io.pil_to_pyg(effects.img_io.arr_to_img(img_arr)),preview_rect.size)
+            edit_img_arr = preview_img_arr
+            view_img = pygame.transform.scale(effects.img_io.pil_to_pyg(effects.img_io.arr_to_img(preview_img_arr)),preview_rect.size)
 
         rescale = False
         clicked_a = adjust_block.update(clicked,moved)
