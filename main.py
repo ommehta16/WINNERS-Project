@@ -31,8 +31,7 @@ def main():
 
     #loading text function
 
-    loading_font = pygame.font.SysFont("free sans",30)
-    loading_text_color = (0,0,0)
+    
     
     def get_options(func):
         nonlocal edit_img_arr, preview_img_arr, preview_rect, rescale, screen, side_bar
@@ -80,6 +79,8 @@ def main():
 
     def loadingtext(func):
         nonlocal screen, adjust_block
+        loading_font = pygame.font.SysFont("free sans",min(30,screen.get_width()/20))
+        loading_text_color = (0,0,0)
         loading_text = loading_font.render('Processing...',1,loading_text_color)
         screen.blit(loading_text,(screen.get_width()/8,adjust_block.adjust_bg.top))
         print((screen.get_width()/8,side_bar.rect.bottom))
@@ -91,7 +92,7 @@ def main():
         pygame.display.set_caption('W    I    D    E')
 
     
-    def blur(a:np.ndarray):
+    def blur():
         nonlocal preview_img_arr
         preview_img_arr = effects.convolute.Blur.gaussian(preview_img_arr,16,(adjust_block.get_slider_val()/2)+0.01)
         
