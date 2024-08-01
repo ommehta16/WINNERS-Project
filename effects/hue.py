@@ -110,22 +110,27 @@ def hue_nine(img_arr:np.ndarray,hue_shift:int):
 
 if __name__ == "__main__":
     from img_io import *
-    img_arr = img_to_arr(open_img("chicken.webp"))
+    img_arr = img_to_arr(open_img("effects/chicken.webp"))
     
-    tests = [
-        (1, hue)
-        (2, hue_four)
-        (3, hue_nine)
-    ]
     times = [[],[],[]]
     for i in range(10):
-        for num, test in tests:
-            start = time.time()
-            test(img_arr,56)
-            end = time.time()
-            times[num-1].append(end-start)
-            print(f"Finished part {num} of test {i+1}/10")
-        print(f"\nFinished test {i+1}/10")
+        start = time.time()
+        hue(img_arr,56)
+        end = time.time()
+        times[0].append(end-start)
+
+        start = time.time()
+        hue_four(img_arr,56)
+        end = time.time()
+        times[1].append(end-start)
+        
+        start = time.time()
+        hue_nine(img_arr,56)
+        end = time.time()
+        times[2].append(end-start)
+        
+        print(f"Finished test {i}/10")
+
     
     print(f"1 thread:  average of {sum(times[0])/len(times[0])} seconds")
     print(f"4 threads: average of {sum(times[1])/len(times[1])} seconds")
