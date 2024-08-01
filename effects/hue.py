@@ -130,7 +130,7 @@ if __name__ == "__main__":
         
         print(f"Finished test {i+1}/10")
 
-    
+     
     print(f"1 thread:  average of {sum(times[0])/len(times[0])} seconds")
     print(f"4 threads: average of {sum(times[1])/len(times[1])} seconds")
     print(f"9 threads: average of {sum(times[2])/len(times[2])} seconds")

@@ -28,7 +28,6 @@ def main():
 
     img = effects.img_io.open_img("test/chicken.webp")
     img_arr = effects.img_io.img_to_arr(img).astype(int)
-    
     # Create the sidebar buttons
     effect_names = ["Reset","Blur","Contrast","Dither","Sharpen","Sepia","Invert","Brightness","Drawing","Hue"]
     def blur():         nonlocal img_arr; img_arr = effects.convolute.Blur.gaussian (img_arr,16,(slider.get_value()/2)+0.01 )
@@ -63,6 +62,23 @@ def main():
         nonlocal img_arr, clicked
         clicked = False
         if filepath: effects.img_io.arr_to_img(img_arr).save(filepath)
+    def mul_image():
+        nonlocal img_arr, img, view_img, clicked
+        clicked = False
+        tmp_img_arr = effects.img_io.img_to_arr(img).astype(int)
+        if tmp_img_arr.shape != img_arr.shape:
+            return False
+        img_arr = (img_arr.astype(float)/255 * tmp_img_arr).astype(int)
+        return True
+    
+    def add_image():
+        nonlocal img_arr, img, view_img, clicked
+        clicked = False
+        tmp_img_arr = effects.img_io.img_to_arr(img).astype(int)
+        if tmp_img_arr.shape != img_arr.shape:
+            return False
+        img_arr = img_arr + tmp_img_arr
+        return True
 
     def update_preview_area():
         nonlocal preview_rect, screen, side_bar, title_bar, img
@@ -82,6 +98,8 @@ def main():
     
     title_bar.add_button(_text="open image",_onclick=lambda:change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")))
     title_bar.add_button(_text="save image",_onclick=lambda:save_image(ui_elements.Prompt.get_file_save()))
+    title_bar.add_button(_text="multiply",_onclick=lambda:mul_image())
+    title_bar.add_button(_text="add",_onclick=lambda:add_image())
     
     adjust = ui_elements.ButtonGrid([0, side_bar.buttons[-1].rect.bottom], [screen.get_size()[0] * 1/4, 20], [3, 1])
     adjust.add_button(_text="CANCEL",_onclick=lambda:change_image(ui_elements.Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")))
