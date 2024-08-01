@@ -63,6 +63,7 @@ def main():
             if adjust_block.adjust.buttons[0].update(clicked):
                 preview_img_arr = edit_img_arr
                 screen = pygame.display.set_mode(screen.get_size(),pygame.RESIZABLE)
+                since_resize = 0
                 return
             if adjust_block.adjust.buttons[1].update(clicked):
                 preview_img_arr = edit_img_arr
@@ -70,8 +71,11 @@ def main():
                 view_img = pygame.transform.scale(effects.img_io.pil_to_pyg(effects.img_io.arr_to_img(preview_img_arr)),preview_rect.size)
                 pygame.display.set_caption("W    I    D    E • Previewing Image")
             if adjust_block.adjust.buttons[2].update(clicked):
+                preview_img_arr = edit_img_arr
                 loadingtext(func)
                 screen = pygame.display.set_mode(screen.get_size(),pygame.RESIZABLE)
+                edit_img_arr = preview_img_arr
+                since_resize = 0
                 return
             screen.blit(view_img,preview_rect.topleft)
             screen.blit(callerText,(screen.get_width()/8 - callerText.get_width()/2,13.5/16*screen.get_height()-callerText.get_width()/2))
@@ -80,10 +84,10 @@ def main():
 
     def loadingtext(func):
         nonlocal screen, adjust_block
-        loading_font = pygame.font.SysFont("free sans",min(30,screen.get_width()/20))
+        loading_font = pygame.font.SysFont("free sans",min(30,int(screen.get_width()/40)))
         loading_text_color = (0,0,0)
         loading_text = loading_font.render('Processing...',1,loading_text_color)
-        screen.blit(loading_text,(screen.get_width()/8,adjust_block.adjust_bg.top))
+        screen.blit(loading_text,(0,adjust_block.adjust_bg.top))
         pygame.display.set_caption("W    I    D    E • Processing Image...")
         pygame.event.pump()
         pygame.display.update()
