@@ -66,10 +66,26 @@ or
 
 <h3>After you run the project you should see a page pop up looking like this:</h3>
 
-<img src = '/Users/armaanthadani/Desktop/Work/Tufts/Final_Project/WINNERS-Project/Readme_home.png'>
+<img src = 'Readme_home.png'>
 
 <h3> Either upload or own file or you can use our sample image to jump right in! </h3>
 
+<h3>After selecting your file or using the sample image you will be redirected to a new window which looks like this</h3>
+
+<img src = 'Readme_entering.png'>
+
+<h3>Here we have the main photo edit page and heres how to get started with editing your images</h3>
+
+ * move the slider to your desired amount (this would determine the intensity of the effect that you would like to apply)
+
+ * Then select the effect you would like to apply to the image
+
+ * Click "PREVIEW" to see how your image would look like with the effect and if you are happy with it you can click "APPLY" to confirm the effect to apply onto your image
+
+  * Note that you can stack effects on top of each other! and if you want to reset your image to its original you can click "Reset" in the sidebar
+
+ * If you want to export your edited image, click "Save Image" in the menu bar to save it locally on your computer we encourage you to share them with your friends and family
+ 
 ### [PART NAME]
 [PART FUNCTION]
 
