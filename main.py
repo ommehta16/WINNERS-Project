@@ -36,6 +36,7 @@ def main():
     def get_options(func):
         nonlocal edit_img_arr, preview_img_arr, preview_rect, rescale, screen, side_bar
         # IT'S WAR CRIME TIME
+        bg = screen.copy()
         preview_img_arr = edit_img_arr
         clicked = False
         rescale = True
@@ -46,9 +47,10 @@ def main():
                 callerID = button.text
                 break
         callerText = tmp_font.render(f"{callerID} Settings",True,(0,0,0))
-
+        view_img = pygame.transform.scale(effects.img_io.pil_to_pyg(effects.img_io.arr_to_img(preview_img_arr)),preview_rect.size)
         while True:
             moved = False
+            screen.blit(bg,(0,0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     quit()
@@ -66,13 +68,12 @@ def main():
                 preview_img_arr = edit_img_arr
                 loadingtext(func)
                 view_img = pygame.transform.scale(effects.img_io.pil_to_pyg(effects.img_io.arr_to_img(preview_img_arr)),preview_rect.size)
-                screen.blit(view_img,preview_rect.topleft)
                 pygame.display.set_caption("W    I    D    E • Previewing Image")
             if adjust_block.adjust.buttons[2].update(clicked):
                 loadingtext(func)
                 screen = pygame.display.set_mode(screen.get_size(),pygame.RESIZABLE)
                 return
-            
+            screen.blit(view_img,preview_rect.topleft)
             screen.blit(callerText,(screen.get_width()/8 - callerText.get_width()/2,13.5/16*screen.get_height()-callerText.get_width()/2))
             pygame.display.update()
             clock.tick(30)
@@ -83,8 +84,6 @@ def main():
         loading_text_color = (0,0,0)
         loading_text = loading_font.render('Processing...',1,loading_text_color)
         screen.blit(loading_text,(screen.get_width()/8,adjust_block.adjust_bg.top))
-        print((screen.get_width()/8,side_bar.rect.bottom))
-        print((screen.get_width(),screen.get_height()))
         pygame.display.set_caption("W    I    D    E • Processing Image...")
         pygame.event.pump()
         pygame.display.update()
