@@ -85,9 +85,3 @@ or
   * Note that you can stack effects on top of each other! and if you want to reset your image to its original you can click "Reset" in the sidebar
 
  * If you want to export your edited image, click "Save Image" in the menu bar to save it locally on your computer we encourage you to share them with your friends and family
-
-### [PART NAME]
-[PART FUNCTION]
-
-### [PART NAME]
-[PART FUNCTION]
