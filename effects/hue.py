@@ -118,7 +118,6 @@ if __name__ == "__main__":
         hue(img_arr,56)
         end = time.time()
         times[0].append(end-start)
-
         start = time.time()
         hue_four(img_arr,56)
         end = time.time()
