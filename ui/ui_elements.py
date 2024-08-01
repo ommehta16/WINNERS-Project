@@ -108,7 +108,7 @@ class ButtonGrid:
 
         for action, image_path, text in buttons:
             self.add_button(_onclick=action,_text=text,_font_size=font_size)
-            self.buttons[-1].set_image(image_path)
+            if len(image_path): self.buttons[-1].set_image(image_path)
 
     def add_button(self, _onclick=lambda: 0, _text: str = "", _font: str = "Calibri", _font_size: int = 12):
         pos = self.rect.topleft
@@ -212,7 +212,7 @@ def title_screen(chng_img,BACKGROUND_COLOR):
     screen = pygame.display.set_mode((800,600))  # Make window resizable
     def title_img_set():
         nonlocal on_title
-        if chng_img(Prompt.get_file_open("Images (*.webp *.png *.jpg *.JPG *.jpeg *.JPEG)")):
+        if chng_img():
             on_title = False
     start_up_button = Button((433,348),(80,40),title_img_set,_text="upload",_fontsize=24,_font="free sans")
     while on_title:
@@ -229,4 +229,51 @@ def title_screen(chng_img,BACKGROUND_COLOR):
         start_up_button.update(clicked)
         pygame.display.update()
         clock.tick(60)
+
+
+class adjustmentTile:
+    def __init__(self,screen:pygame.Surface,top:int,preview,apply):
+        self.hidden = True
+        self.owner = None
+
+        self.adjust = ButtonGrid([0, top], [screen.get_size()[0] * 1/4, 20], [3, 1])
+        self.adjust.add_button(_text="CANCEL",_onclick=self.hide)
+        self.adjust.add_button(_text="PREVIEW",_onclick=preview)
+        self.adjust.add_button(_text="APPLY",_onclick=apply)
+
+        self.adjust_bg = pygame.rect.Rect([0, top],[screen.get_size()[0] * 1/4, screen.get_size()[1]-top])
+
+        self.slider_font = pygame.font.SysFont("free sans",30)
+        self.slider_color = (0,0,0)
+        self.slider = Slider((self.adjust_bg.width // 2, self.adjust_bg.bottom - 150), (self.adjust_bg.width - 40, 20), 0, 0, 100)
+
+    def hide(self):
+        pass
+
+    def get_slider_val(self):
+        return self.slider.get_value()
+    
+    def update(self,clicked:bool,moved):
+        self.slider_value_text = self.slider_font.render(f'{int(self.slider.get_value())}',1,self.slider_color)
+        self.slider.update(clicked,moved)
+
+        click_return = clicked
+        if self.slider.selected:
+            click_return = False
+        self.adjust.update(click_return)
+        return click_return
+
+    def update_size(self,screen:pygame.Surface,top):
+        self.adjust.rect.update(self.adjust.rect.left,screen.get_size()[1]-max((screen.get_size()[1] - top)/4,20),screen.get_size()[0] * 1/4, max((screen.get_size()[1] - top)/4,20))
+        self.adjust_bg.update([0, top],[screen.get_size()[0] * 1/4, screen.get_size()[1]-top])
+        self.slider.rect.center = (self.adjust_bg.centerx,self.adjust_bg.centery+self.adjust_bg.height/8)
+        self.slider.rect.size = (self.adjust_bg.width-40,20)
+
+    def draw(self):
+        screen = pygame.display.get_surface()
+        pygame.draw.rect(screen,"dark gray", self.adjust_bg)
+        self.adjust.draw()
+        self.slider.draw()
+        screen.blit(self.slider_value_text, (self.slider.rect.left,self.slider.rect.top - self.slider_value_text.get_height()))
+
     
