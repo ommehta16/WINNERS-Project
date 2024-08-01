@@ -40,7 +40,7 @@ def main():
     def sepia():        nonlocal img_arr; img_arr = effects.sepia.sepia             (img_arr,   slider.get_value()          )
     def undo():         nonlocal img_arr; img_arr = effects.img_io.img_to_arr(img).astype(int)
     def invert():       nonlocal img_arr; img_arr = effects.invert.invert           (img_arr,   (-(slider.get_value()*2))   )
-    def hue():          nonlocal img_arr; img_arr = effects.hue.hue                 (img_arr,   (slider.get_value()*3.6)    )
+    def hue():          nonlocal img_arr; img_arr = effects.hue.hue_nine         (img_arr,   int(slider.get_value()*3.6)    )
     side_bar_buttons = [ ([undo,blur,contrast,dither,sharpen,sepia,invert,brightness,dog,hue][i],
                           f"images/icons/effects/{effect_names[i].lower()}.png", effect_names[i]) for i in range(len(effect_names))]
     

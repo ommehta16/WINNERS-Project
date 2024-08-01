@@ -106,35 +106,12 @@ def hue_nine(img_arr:np.ndarray,hue_shift:int):
     img_arr[partY:2*partY,2*partX:] = chunks[7]
     img_arr[2*partY:,2*partX:] = chunks[8]
 
+    return img_arr
+
 if __name__ == "__main__":
     from img_io import *
     img_arr = img_to_arr(open_img("test/chicken.webp"))
-    one_times = []
-    four_times = []
-    nine_times = []
-    for i in range(10):
-        start = time.time()
-        new_img_arr = hue(img_arr,90)
-        end = time.time()
-        one_times.append(end-start)
     
-        start = time.time()
-        new_img_arr = hue_four(img_arr,90)
-        end = time.time()
-        four_times.append(end-start)
+    img_arr = hue_nine(img_arr,56)
 
-        start = time.time()
-        new_img_arr = hue_nine(img_arr,90)
-        end = time.time()
-        nine_times.append(end-start)
-
-        print(f"Finished trial {i+1}/10")
-    
-    print()
-    one_avg = sum(one_times)/len(one_times)
-    four_avg = sum(four_times)/len(four_times)
-    nine_avg = sum(nine_times)/len(nine_times)
-
-    print(f"1 chunk took an average of {one_avg} seconds")
-    print(f"4 chunks took an average of {four_avg} seconds")
-    print(f"9 chunks took an average of {nine_avg} seconds")
+    Image.fromarray(img_arr.astype(np.uint8)).save("test/output.png")
