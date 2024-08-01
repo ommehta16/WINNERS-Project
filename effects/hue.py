@@ -129,7 +129,7 @@ if __name__ == "__main__":
         end = time.time()
         times[2].append(end-start)
         
-        print(f"Finished test {i}/10")
+        print(f"Finished test {i+1}/10")
 
     
     print(f"1 thread:  average of {sum(times[0])/len(times[0])} seconds")
