@@ -3,64 +3,138 @@ import numpy as np
 import math
 import sys
 import time
+from multiprocessing import Pool
+
+def rgb_to_hsv(rgb) -> np.ndarray:
+    r,g,b = rgb[0],rgb[1],rgb[2]
+    mx = max(r, g, b)
+    mn = min(r, g, b)
+    df = mx - mn
+
+    if mx == mn:
+        h = 0
+    elif mx == r:
+        h = (60 * ((g - b) / df) + 360) % 360
+    elif mx == g:
+        h = (60 * ((b - r) / df) + 120) % 360
+    elif mx == b:
+        h = (60 * ((r - g) / df) + 240) % 360
+    
+    if mx == 0:
+        s = 0
+    else:
+        s = df / mx
+    v = mx
+
+    return np.array([h,s,v]).astype(float)
+
+def hsv_to_rgb(hsv) -> np.ndarray:
+    h, s, v = hsv[0],hsv[1],hsv[2]
+    c = v * s
+    x = c * (1 - abs((h / 60) % 2 - 1))
+    m = v - c
+
+    if 0 <= h < 60:
+        r, g, b = c, x, 0
+    elif 60 <= h < 120:
+        r, g, b = x, c, 0
+    elif 120 <= h < 180:
+        r, g, b = 0, c, x
+    elif 180 <= h < 240:
+        r, g, b = 0, x, c
+    elif 240 <= h < 300:
+        r, g, b = x, 0, c
+    elif 300 <= h < 360:
+        r, g, b = c, 0, x
+    
+    return np.array([r+m,g+m,b+m])
 
 def hue(img_array: np.ndarray, hue_shift:int):
     img_hsv = np.zeros_like(img_array, dtype=np.float32)
+    # start = time.time()
     for i in range(img_array.shape[0]):
         for j in range(img_array.shape[1]):
-            r, g, b = img_array[i, j] / 255.0
-            mx = max(r, g, b)
-            mn = min(r, g, b)
-            df = mx - mn
-            if mx == mn:
-                h = 0
-            elif mx == r:
-                h = (60 * ((g - b) / df) + 360) % 360
-            elif mx == g:
-                h = (60 * ((b - r) / df) + 120) % 360
-            elif mx == b:
-                h = (60 * ((r - g) / df) + 240) % 360
-            if mx == 0:
-                s = 0
-            else:
-                s = df / mx
-            v = mx
-            img_hsv[i, j] = [h, s, v]
-
+            img_hsv[i, j] = rgb_to_hsv(img_array[i,j]/255.0)
+    # print(f"rgb to hsv: {time.time()-start} seconds")
     img_hsv[..., 0] = (img_hsv[..., 0] + hue_shift) % 360
 
     img_rgb = np.zeros_like(img_hsv, dtype=np.float32)
+    
+    # start = time.time()
     for i in range(img_hsv.shape[0]):
         for j in range(img_hsv.shape[1]):
-            h, s, v = img_hsv[i, j]
-            c = v * s
-            x = c * (1 - abs((h / 60) % 2 - 1))
-            m = v - c
-            if 0 <= h < 60:
-                r, g, b = c, x, 0
-            elif 60 <= h < 120:
-                r, g, b = x, c, 0
-            elif 120 <= h < 180:
-                r, g, b = 0, c, x
-            elif 180 <= h < 240:
-                r, g, b = 0, x, c
-            elif 240 <= h < 300:
-                r, g, b = x, 0, c
-            elif 300 <= h < 360:
-                r, g, b = c, 0, x
-            img_rgb[i, j] = [(r + m) * 255, (g + m) * 255, (b + m) * 255]
-
+            img_rgb[i, j] = 255 * hsv_to_rgb(img_hsv[i,j])
+    # print(f"hsv to rgb: {time.time()-start} seconds")
     img_rgb = img_rgb.astype(np.uint8)
     
     return img_rgb
 
+def hue_four(img_arr:np.ndarray,hue_shift:int):
+    halfY = img_arr.shape[0]//2
+    halfX = img_arr.shape[1]//2
+    with Pool() as pool:
+        chunks = pool.starmap(hue,[
+            [img_arr[:halfY,:halfX],hue_shift], [img_arr[halfY:,:halfX],hue_shift],
+            [img_arr[:halfY,halfX:],hue_shift], [img_arr[halfY:,halfX:],hue_shift],
+            ])
+
+    img_arr[:halfY,:halfX] = chunks[0]
+    img_arr[halfY:,:halfX] = chunks[1]
+    img_arr[:halfY,halfX:] = chunks[2]
+    img_arr[halfY:,halfX:] = chunks[3]
+
+
+    return img_arr
+
+def hue_nine(img_arr:np.ndarray,hue_shift:int):
+    partY = img_arr.shape[0]//3
+    partX = img_arr.shape[1]//3
+    with Pool() as pool:
+        chunks = pool.starmap(hue,[
+            [img_arr[:partY,:partX],hue_shift],         [img_arr[partY:2*partY,:partX],hue_shift], [img_arr[2*partY:,:partX],hue_shift],
+            [img_arr[:partY,partX:2*partX],hue_shift],  [img_arr[partY:2*partY,partX:2*partX],hue_shift], [img_arr[2*partY:,partX:2*partX],hue_shift],
+            [img_arr[:partY,2*partX:],hue_shift],       [img_arr[partY:2*partY,2*partX:],hue_shift], [img_arr[2*partY:,2*partX:],hue_shift],
+            ])
+
+    img_arr[:partY,:partX] = chunks[0]
+    img_arr[partY:2*partY,:partX] = chunks[1]
+    img_arr[2*partY:,:partX] = chunks[2]
+    img_arr[:partY,partX:2*partX] = chunks[3]
+    img_arr[partY:2*partY,partX:2*partX] = chunks[4]
+    img_arr[2*partY:,partX:2*partX] = chunks[5]
+    img_arr[:partY,2*partX:] = chunks[6]
+    img_arr[partY:2*partY,2*partX:] = chunks[7]
+    img_arr[2*partY:,2*partX:] = chunks[8]
+
 if __name__ == "__main__":
     from img_io import *
-    import convolute
+    img_arr = img_to_arr(open_img("test/chicken.webp"))
+    one_times = []
+    four_times = []
+    nine_times = []
+    for i in range(10):
+        start = time.time()
+        new_img_arr = hue(img_arr,90)
+        end = time.time()
+        one_times.append(end-start)
     
-    start = time.time()
-    new_img_arr = hue("test/chicken.webp",90)
-    end = time.time()
+        start = time.time()
+        new_img_arr = hue_four(img_arr,90)
+        end = time.time()
+        four_times.append(end-start)
+
+        start = time.time()
+        new_img_arr = hue_nine(img_arr,90)
+        end = time.time()
+        nine_times.append(end-start)
+
+        print(f"Finished trial {i+1}/10")
     
-    arr_to_img(new_img_arr).save("test/output.png")
-    print(str(end-start) + " seconds")
+    print()
+    one_avg = sum(one_times)/len(one_times)
+    four_avg = sum(four_times)/len(four_times)
+    nine_avg = sum(nine_times)/len(nine_times)
+
+    print(f"1 chunk took an average of {one_avg} seconds")
+    print(f"4 chunks took an average of {four_avg} seconds")
+    print(f"9 chunks took an average of {nine_avg} seconds")
