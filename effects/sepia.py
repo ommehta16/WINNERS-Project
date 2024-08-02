@@ -7,15 +7,6 @@ import time
 def sepia(image: np.ndarray, intensity: float) -> np.ndarray:
     # applies a sepia filter which imitates vintage photos by applying a reddish-brown tone
 
-    '''
-    Parameters:
-        image: The input image, as a numpy array
-        intensity: the intensity of the sepia effect, calculated between 0 and 1.
-
-    Returns:
-        The image with the sepia filter applied, as a numpy array
-    '''
-
     # ensure intensity is between 1 and 0
     intensity = min(1,max(0,intensity))
 
