@@ -5,7 +5,10 @@ import pygame
 # All of these functions are pretty self explanatory. They're really just here to increase readability in main/etc.
 
 def img_to_arr(image:Image.Image) -> np.ndarray:
-    return np.array(image).astype(int)
+    img = np.array(image).astype(int)
+    if img.shape[2] > 3:
+        img = img[:,:,:3]
+    return img
 
 def arr_to_img(image_array:np.ndarray) -> Image.Image :
     return Image.fromarray(np.clip(image_array,0,255).astype(np.uint8))
