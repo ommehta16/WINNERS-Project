@@ -30,11 +30,11 @@ or
 
 <h3>First Install the zip file in our repository</h3>
 
-<h3>Navigate to the directory that you want to run the project in using</h3>
+<h4>Navigate to the directory that you want to run the project in using</h4>
 
-``cd /path/to/directory``
+``cd /[path to directory]``
 
-<h3>Unzip the zip file using</h3>
+<h4>Unzip the zip file using</h4>
 
 ``unzip WIDE.zip``
 
@@ -68,20 +68,25 @@ or
 
 <img src = 'images/Readme_home.png'>
 
-<h3> Either upload or own file or you can use our sample image to jump right in! </h3>
+<h3> Upload a file from anywhere on your computer and jump right into editing! You can use one of our sample images from the "test" folder</h3>
 
-<h3>After selecting your file or using the sample image you will be redirected to a new window which looks like this</h3>
+<h3>After selecting your file, you will be redirected to a new window which looks like this</h3>
 
 <img src = 'images/Readme_entering.png'>
 
-<h3>Here we have the main photo edit page and heres how to get started with editing your images</h3>
+<h3>Here we have the main photo edit page.</h3>
 
- * move the slider to your desired amount (this would determine the intensity of the effect that you would like to apply)
+<h4>To get started with editing your images:</h4>
 
- * Then select the effect you would like to apply to the image
+ * Choose an effect that you would like to apply to the image
 
- * Click "PREVIEW" to see how your image would look like with the effect and if you are happy with it you can click "APPLY" to confirm the effect to apply onto your image
+ * Move the slider to your desired amount (this would determine the intensity of the effect that you would like to apply)
 
-  * Note that you can stack effects on top of each other! and if you want to reset your image to its original you can click "Reset" in the sidebar
+ * Click "PREVIEW" to see how your image would look like with the effect and if you are happy with it you can click "APPLY" to confirm the effect to apply onto your image. If you don't want to apply this particular effect, click "CANCEL" to switch effects
 
- * If you want to export your edited image, click "Save Image" in the menu bar to save it locally on your computer we encourage you to share them with your friends and family
+    * You can stack effects on top of each other!
+    * If you want to reset your image to its original you can click "Reset" in the sidebar
+
+ * To export your edited image, click "Save Image" in the menu bar, and use the system prompt to choose the correct location and file type to save as.
+
+ * You can use the "MULTIPLY" and "ADD" functions at the top of the screen to multiply/add your edited image with the original

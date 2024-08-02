@@ -14,7 +14,7 @@ def dither_chl(img:np.ndarray) -> np.ndarray:
     new_img = np.zeros(img.shape).astype(int)
     for y in range(new_img.shape[0]):
         for x in range(new_img.shape[1]):
-            if (img[y,x] > filter[y % filter.shape[0],x % filter.shape[1]]):
+            if (img[y,x] > filter[y % filter.shape[0],x % filter.shape[1]]): # Use mod with the filter shape so that we can iterate over it in a straight line instead of a series of boxes
                 new_img[y,x] = 255
     return new_img
 def dither(img:np.ndarray,color:bool) -> np.ndarray:
@@ -27,16 +27,19 @@ def dither(img:np.ndarray,color:bool) -> np.ndarray:
         return new_img
     if color:
         with Pool() as pool:
-            chls = pool.map(dither_chl,[img[:,:,i] for i in range(3)])
+            chls = pool.map(dither_chl,[img[:,:,i] for i in range(3)]) # Split it into 3 channels and dither each of those seperately
         for c in range(3):
-            img[:,:,c] = chls[c]
+            img[:,:,c] = chls[c] # set each channel
     else:
         img = grayscale(img)
         img = dither_chl(img)
         img = chnl_1_to_3(img)
+        # Convert it back to 3 channels so that the rest of the program doesn't throw a fit
     return img
 
 if __name__ == "__main__":
+    # Test code! Shows you how fast/slow this is!
+    # 11.582612991333008 seconds on Om's computer
     from img_io import *
     img_arr = img_to_arr(open_img("test/chicken.webp"))
     

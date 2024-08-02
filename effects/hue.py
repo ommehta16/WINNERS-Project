@@ -1,8 +1,5 @@
 from PIL import Image
 import numpy as np
-import math
-import sys
-import time
 from multiprocessing import Pool
 
 def rgb_to_hsv(rgb) -> np.ndarray:
@@ -83,19 +80,19 @@ def hue_four(img_arr:np.ndarray,hue_shift:int):
     img_arr[:halfY,halfX:] = chunks[2]
     img_arr[halfY:,halfX:] = chunks[3]
 
-
     return img_arr
 
 def hue_nine(img_arr:np.ndarray,hue_shift:int):
+    '''Rotate the hue of 9 parts of the image'''
     partY = img_arr.shape[0]//3
     partX = img_arr.shape[1]//3
-    with Pool() as pool:
+    with Pool() as pool: # mp part
         chunks = pool.starmap(hue,[
             [img_arr[:partY,:partX],hue_shift],         [img_arr[partY:2*partY,:partX],hue_shift], [img_arr[2*partY:,:partX],hue_shift],
             [img_arr[:partY,partX:2*partX],hue_shift],  [img_arr[partY:2*partY,partX:2*partX],hue_shift], [img_arr[2*partY:,partX:2*partX],hue_shift],
             [img_arr[:partY,2*partX:],hue_shift],       [img_arr[partY:2*partY,2*partX:],hue_shift], [img_arr[2*partY:,2*partX:],hue_shift],
             ])
-
+    # set each slice of the output array to its corresponding chunk
     img_arr[:partY,:partX] = chunks[0]
     img_arr[partY:2*partY,:partX] = chunks[1]
     img_arr[2*partY:,:partX] = chunks[2]
@@ -109,7 +106,9 @@ def hue_nine(img_arr:np.ndarray,hue_shift:int):
     return img_arr
 
 if __name__ == "__main__":
+    # This test code runs the 1-, 4- and 9- threaded versions against eachother. Turns out that more parallel is more faster-er. Who could've guessed
     from img_io import *
+    import time
     img_arr = img_to_arr(open_img("effects/chicken.webp"))
     
     times = [[],[],[]]

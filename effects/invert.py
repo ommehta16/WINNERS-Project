@@ -3,6 +3,8 @@ import numpy as np
 from effects import img_io
 
 def invert(img: np.array, change: float) -> np.array:
+    '''`change`: 0 = full gray, 100 = full color, -100 = fully inverted'''
+    # This is really the same thing as contrast
     gray = np.zeros(img.shape).astype(int)
     gray = gray + 127
     change /= 100

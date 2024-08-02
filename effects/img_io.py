@@ -2,6 +2,7 @@ from PIL import Image
 import numpy as np
 import pygame
 
+# All of these functions are pretty self explanatory. They're really just here to increase readability in main/etc.
 
 def img_to_arr(image:Image.Image) -> np.ndarray:
     return np.array(image).astype(int)

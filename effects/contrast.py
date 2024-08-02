@@ -3,9 +3,10 @@ import numpy as np
 from effects import img_io
 
 def contrast(img: np.array, change: float) -> np.array:
-    
+    '''`change` is a value where 0 is fully gray and 100 is full color'''
+    # lerp between gray and the full color image: use change as the value to lerp by
     gray = np.zeros(img.shape).astype(int)
-    gray = gray + 127
+    gray = gray + 127 #gray is filled with just (127,127,127) for the entire array
     change /= 100
     img = change*img + (1-change)*gray
                                            
