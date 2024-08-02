@@ -56,6 +56,7 @@ def main():
             if adjust_block.adjust.buttons[0].update(clicked): # Cancel
                 preview_img_arr = edit_img_arr
                 since_resize = 0
+                pygame.display.set_caption(NAME)
                 return
             if adjust_block.adjust.buttons[1].update(clicked): # Preview
                 preview_img_arr = edit_img_arr
@@ -67,6 +68,7 @@ def main():
                 loadingtext(effect, adjust_block)
                 edit_img_arr = preview_img_arr
                 since_resize = 0
+                pygame.display.set_caption(NAME)
                 return
             screen.blit(view_img,preview_rect.topleft)
             screen.blit(callerText,(screen.get_width()/8 - callerText.get_width()/2,13.5/16*screen.get_height()-callerText.get_width()/2))
