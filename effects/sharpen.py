@@ -7,32 +7,25 @@ from multiprocessing import Pool
 from effects import convolute
 
 
-def sharpen_chnl(chl:np.ndarray,filt:np.ndarray,radius) -> np.ndarray:
-    sharp_chl = np.zeros_like(chl,dtype=float)
-    for y in range(radius, chl.shape[0] - radius):
-        for x in range(radius, chl.shape[1] - radius):
-            sharp_chl[y-radius:y+radius + 1,
-                      x-radius:x+radius + 1
-                    ] += chl[y, x] * filt
-    return sharp_chl
 def make_sharp_mask(intensity,power):
     # logic taken from https://blog.demofox.org/2022/02/26/image-sharpening-convolution-kernels/
     intensity = max(1, round(intensity) * 2 + 1)
     blur_filter = np.ones((intensity, intensity))
     identity = np.zeros((intensity,intensity))
-    identity[intensity // 2, intensity // 2] = 1 + power
-    blur_filter /= intensity**2
-    filter = identity - blur_filter * power
+    identity[intensity // 2, intensity // 2] = 1 + power # the center of identity is 1+power
+    blur_filter /= intensity**2 # make the sum of blur filter 1
+    filter = identity - blur_filter * power # Creates a distribution where the center point is REALLY high, and the outside is fairly low. mask sum is 0
     return filter
 
 def sharpen(image:np.ndarray, intensity:float, power:float) -> np.ndarray:
     filter  = make_sharp_mask(intensity,power)    
-    sharpened_img = convolute.convolute(image,filter)
+    sharpened_img = convolute.convolute(image,filter) # All that sharpening is is convolution with a special filter
     sharpened_img = np.clip(sharpened_img, 0, 255).astype(int)
     return sharpened_img
 
 # Takes 25.406 seconds -- That's kinda SLOW
 if __name__ == "__main__":
+    # more test code -- almost the same as the test code from other files, tests for the amount of time that this takes (and outputs so that we can check whether it worked)
     from img_io import *
     import convolute
     img_arr = img_to_arr(open_img("test/chicken.webp"))
