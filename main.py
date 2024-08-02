@@ -27,7 +27,8 @@ def main():
     img = effects.img_io.open_img("test/chicken.webp")
     preview_img_arr = effects.img_io.img_to_arr(img).astype(int)
     clicked = False
-    
+    pygame.display.set_icon(pygame.image.load("images/icons/icon512.png"))
+
     # Wrapper for the functions that apply effects: allows for the preview/tweaking mode
     def get_options(effect):
         nonlocal preview_img_arr, preview_rect, screen, side_bar, since_resize
